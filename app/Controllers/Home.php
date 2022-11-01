@@ -15,7 +15,6 @@ class Home extends AppController {
         // get the clients and web statistics list
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys') ?? [];
         
-        prep($data);
         try {
             return view('index', $data);
         } catch(\Exception $e) {

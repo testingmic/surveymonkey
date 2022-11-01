@@ -40,7 +40,7 @@ class AppController extends ApiServices {
      * @return String
      */
     public function not_found_text($section = null) {
-        return "The requested {$section} information does not exist on the system.";
+        return "This survey has been deleted or you are not authorized to access this page.";
     }
 
     /**
@@ -74,7 +74,7 @@ class AppController extends ApiServices {
      * 
      * @return Array
      */
-    public function api_response($method, $page, $request) {
+    public function api_response($request, $method = "GET", $page = null) {
         
         $info['code'] = $request['code'] ?? 203;
         $method = strtoupper($method);
