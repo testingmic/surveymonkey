@@ -1,0 +1,10 @@
+{
+	"surveys": {
+		"GET": {
+			"list": {
+				"slug":"match_alphanum|min_length=5|max_length=32",
+				"id":"match_num|max_length=500"
+			}
+		}
+	}
+}
