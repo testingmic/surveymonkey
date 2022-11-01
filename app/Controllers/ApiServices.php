@@ -42,6 +42,11 @@ class ApiServices extends BaseController {
 		// set the token for requests
 		$this->_userApiToken = !empty($this->_userApiToken) ? $this->_userApiToken : $this->sessionObj->_userApiToken;
 
+		if(empty($this->_userApiToken) && !empty($this->sessObject->_generalAPIToken)) {
+			// set the api to use
+			$this->_userApiToken = $this->sessObject->_generalAPIToken;
+		}
+
 		// print the results
 		return $this->curl_request($endpoint, $param);
 	}

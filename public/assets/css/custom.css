@@ -342,3 +342,76 @@ p.alert {
 #app-disabled-status {
     display: none
 }
+
+.survey-header {
+    background-color: #353535;
+    color: #fff;
+    font-size: 30px;
+    padding: 0.5em 0;
+    font-weight: bold;
+    font-family: var(--playful-font-family);
+}
+
+.survey-header .header-title {
+    margin: auto auto;
+    max-width: 800px;
+}
+
+.survey-body {
+    padding-top: 20px;
+    max-width: 800px;
+    margin: auto auto;
+}
+
+.begin-button {
+    font-family: var(--playful-font-family);
+    font-size: 20px;
+    width: 150px;
+}
+
+.not-allowed {
+    cursor: grab!important;
+}
+
+.fluid-image {
+    width: 100%;
+    text-align: center;
+    max-height: 350px;
+    overflow: hidden;
+}
+
+.fluid-image img {
+    max-width: 550px;
+}
+
+@media (max-width:800px){
+    .fluid-image img {
+        max-width: 80%;
+    }
+}
+
+@media (max-width:500px){
+    .fluid-image img {
+        max-width: 100%;
+    }
+}
+
+@media (max-width:800px){
+
+    .fluid-image {
+        max-height: 320px;
+        overflow: hidden;
+    }
+
+    .survey-header {
+        padding: 0.4em 10px;
+    }
+    .survey-header .header-title {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .survey-body {
+        padding: 0.5rem;
+    }
+}

@@ -30,6 +30,7 @@ $isLoggedIn = !empty($sessObj->_userApiToken) && !empty($sessObj->_schoolId) && 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&amp;display=swap" media="all" />
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/fontawesome.css">
-    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css?v=1.0">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/toastr.css">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css">
 </head>
 <body>

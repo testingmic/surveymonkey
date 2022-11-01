@@ -11,11 +11,11 @@ class Home extends AppController {
 
         // get list of all clients
         $this->generalApi = true;
-        $this->_userApiToken = $this->sessObject->_generalAPIToken;
         
         // get the clients and web statistics list
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys') ?? [];
         
+        prep($data);
         try {
             return view('index', $data);
         } catch(\Exception $e) {
