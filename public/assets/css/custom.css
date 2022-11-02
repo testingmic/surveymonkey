@@ -369,6 +369,7 @@ p.alert {
 
 .question-title {
     font-family: var(--playful-font-family);
+    font-weight: bold;
 }
 
 .begin-button {

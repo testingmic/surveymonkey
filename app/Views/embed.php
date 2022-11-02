@@ -20,14 +20,15 @@ include_once 'headtags.php';
             <button id="poll-button" data-default="<?= $survey['button_text'] ?>" class="btn btn-success begin-button">
                 <?= $isContinue ? "Continue" : $survey['button_text'] ?>
             </button>
-            <div class="mt-2 hidden" id="skipquestion">
+            <div class="mt-3 hidden" id="skipquestion">
                 <span onclick="return skipped_question()" class="text-black text-decoration-underline cursor" title="Skip this question">
-                    <small>Skip Question</small>
+                    <small>Skip Category</small>
                 </span>
             </div>
-            <div class="percentage"></div>
+            <div class="percentage mt-2 pt-0"></div>
             <input type="hidden" disabled name="multipleVoting" value="<?= $multipleVoting ?>">
             <input type="hidden" disabled name="ipAddress" value="<?= $ip_address ?>">
+            <input type="hidden" disabled name="hasSkipped" value="No">
             <input type="hidden" disabled name="proceed_to_load" value="continue">
         </div>
     </div>

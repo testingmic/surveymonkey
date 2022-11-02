@@ -223,7 +223,6 @@ class SurveysController extends AccessBridge {
 
         // remove the session variables
         session()->remove(['surveyAnswers', 'firstQuestion', 'nextQuestion']);
-        session()->set(['initSurvey' => true]);
 
         return ['status' => 'votes_logged_successfully', 'guid' => array_column($users, 'guid')];
 

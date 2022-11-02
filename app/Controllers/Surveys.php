@@ -39,7 +39,7 @@ class Surveys extends AppController {
 
         // force refresh
         if( !empty($this->sessObject->forceRefresh) ) {
-            $this->sessObject->remove(['surveyAnswers', 'firstQuestion', 'nextQuestion', 'forceRefresh']);
+            $this->sessObject->remove(['surveyAnswers', 'initSurvey', 'firstQuestion', 'nextQuestion', 'forceRefresh']);
         }
 
         // next question
@@ -268,8 +268,8 @@ class Surveys extends AppController {
             $percentage = round(($answersCount / $questionsCount) * 100);
 
             $additional['percentage'] = '
-            <div class="progress-bar-container">
-                <div class="progress-bar">
+            <div class="progress-bar-container mt-0">
+                <div class="progress-bar mt-1">
                     <div class="progress-bar-completed" style="width: '.$percentage.'%;"></div>
                 </div>
                 <div class="progress-bar-percentage">'.$percentage.'% completed</div>
@@ -311,7 +311,7 @@ class Surveys extends AppController {
             $additional['button_text'] = $multipleVoting ? "<i class='fa fa-dice-d6'></i> Cast Another Vote" : "<i class='fa fa-compress-arrows-alt'></i> Complete";
 
             $this->sessObject->remove('firstQuestion');
-            $this->sessObject->set(['forceRefresh' => true]);
+            $this->sessObject->set(['forceRefresh' => true, 'initSurvey' => true]);
 
         }
 
