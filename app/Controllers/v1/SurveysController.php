@@ -171,8 +171,7 @@ class SurveysController extends AccessBridge {
 
         if(!in_array($params['guid'], $guids)) {
             $users[] = [
-                'guid' => $params['guid'],
-                'ipaddress' => $params['ip_address']
+                'guid' => $params['guid']
             ];
         }
 
@@ -191,8 +190,10 @@ class SurveysController extends AccessBridge {
                 return false;
             });
             
+            $thechoice = mb_strlen($vote['choice']) > 0 ? $vote['choice'] : "skipped";
+            
             if(empty($question)) {
-                $votes_cast[$vote['choice']] = 1;
+                $votes_cast[$thechoice] = 1;
 
                 $this->db_model->db->table('surveys_votes')->insert([
                     'survey_id' => $params['survey_id'], 'question_id' => $vote['question'],
@@ -201,7 +202,7 @@ class SurveysController extends AccessBridge {
             } else {
                 $array_key = array_key_first($question);
                 $casted = json_decode($question[$array_key]['votes'], true);
-                $casted[$vote['choice']] = isset($casted[$vote['choice']]) ? ($casted[$vote['choice']] + 1) : 1;
+                $casted[$thechoice] = isset($casted[$thechoice]) ? ($casted[$thechoice] + 1) : 1;
                 
                 $this->db_model->db->table('surveys_votes')->update(
                     ['votes' => json_encode($casted)],

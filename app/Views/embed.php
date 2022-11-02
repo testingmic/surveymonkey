@@ -1,7 +1,7 @@
 <?php
 include_once 'headtags.php';
 ?>
-<div class="survey-container pb-5">
+<div class="survey-container">
     <div class="survey-header">
         <div class="header-title">
             <?= $survey['title'] ?>
@@ -20,8 +20,14 @@ include_once 'headtags.php';
             <button id="poll-button" data-default="<?= $survey['button_text'] ?>" class="btn btn-success begin-button">
                 <?= $isContinue ? "Continue" : $survey['button_text'] ?>
             </button>
+            <div class="mt-2 hidden" id="skipquestion">
+                <span onclick="return skipped_question()" class="text-black text-decoration-underline cursor" title="Skip this question">
+                    <small>Skip Question</small>
+                </span>
+            </div>
             <div class="percentage"></div>
             <input type="hidden" disabled name="multipleVoting" value="<?= $multipleVoting ?>">
+            <input type="hidden" disabled name="ipAddress" value="<?= $ip_address ?>">
             <input type="hidden" disabled name="proceed_to_load" value="continue">
         </div>
     </div>

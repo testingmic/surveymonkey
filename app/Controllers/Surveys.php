@@ -56,6 +56,7 @@ class Surveys extends AppController {
         $data['multipleVoting'] = (bool) !empty($data['survey']['settings']['allow_multiple_voting']) ? "Yes" : "No";
         $users = !empty($data['survey']['users_logs']) ? json_decode($data['survey']['users_logs'], true) : [];
         $data['votersGUID'] = !empty($users) ? array_column($users, 'guid') : [];
+        $data['ip_address'] = $this->request->getIPAddress();
 
         // display the page
         return $this->show_display('embed', $data);
@@ -137,8 +138,10 @@ class Surveys extends AppController {
             // options
             $options = !empty($quest['options']) ? json_decode($quest['options'], true) : [];
 
-            if(!isset($options[($choice_id-1)])) {
-                return $this->error('The selected option is not valid.');
+            if( mb_strlen($choice_id) > 0 ) {
+                if(!isset($options[($choice_id-1)])) {
+                    return $this->error('The selected option is not valid.');
+                }
             }
 
             // get answers
@@ -271,9 +274,11 @@ class Surveys extends AppController {
                 </div>
                 <div class="progress-bar-percentage">'.$percentage.'% completed</div>
             </div>
-            <div class="useripaddress text-center">
+            <div class="useripaddress hidden text-center" hidden>
                 '.$ip_address.'
             </div>';
+
+            $additional['can_skip'] = !empty($theQuestion['is_required']) ? "No" : "Yes";
 
             $additional['button_text'] = "Continue";
 
@@ -284,8 +289,7 @@ class Surveys extends AppController {
             $vote = $votesObject->castvotes([
                 'survey_id' => $this->sessObject->surveyId, 
                 'votes' => $theAnswers,
-                'ip_address' => $ip_address,
-                'guid' => $params['guid'] ?? null,
+                'guid' => $params['guid'] .'_'. $ip_address,
             ]);
 
             // if not successful

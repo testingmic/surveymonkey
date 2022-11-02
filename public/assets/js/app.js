@@ -55,31 +55,31 @@ var guid = function() {
 $(`button[id="poll-button"]`).on("click", async function() {
 
     $(`div[class='select-notice']`).html(``);
+    $(`div[id="skipquestion"]`).addClass('hidden');
     $(`button[id="poll-button"]`).removeClass('shaking');
 
     let data = {};
 
-    single_voting_check();
-    
     if($(`input[name="proceed_to_load"]`).val() == 'poll-refresh') {
         refresh_handler();
     }
 
     if($(`input[name='is_required']`).length) {
+        
         let selected_option = $(`input[name='question[choice_id]']:checked`);
         if( !selected_option.length && $(`input[name='is_required']`).val() == 1) {
             selectnotice('This question requires an answer.');
             return false;
         }
 
-        if( selected_option.length !== 1) {
+        if( ($(`input[name='is_required']`).val() == 1) && (selected_option.length !== 1)) {
             selectnotice('Only one answer is to be selected.');
             return false
         }
 
         data = {
             guid: guid(),
-            choice_id: selected_option.val(),
+            choice_id: selected_option.length ? selected_option.val() : "",
             question_id: $(`input[name='question[questionId]']`).val()
         }
     }
@@ -87,6 +87,8 @@ $(`button[id="poll-button"]`).on("click", async function() {
     $(`button[id="poll-button"]`).attr({'disabled': true}).html(`<i class="fa fa-spin fa-spinner"></i>`);
 
     $(`div[class='select-notice']`).html(``);
+
+    multi_voting_check();
 
     $.post(`${baseURL}surveys/show_question`, data).then((response) => {
         if( response.code !== 200) {
@@ -111,6 +113,12 @@ $(`button[id="poll-button"]`).on("click", async function() {
                     votersGUID = response.data.additional.guids;
                 } 
 
+                if(response.data.additional.can_skip !== undefined) {
+                    if(response.data.additional.can_skip == 'Yes') {
+                        $(`div[id="skipquestion"]`).removeClass('hidden');
+                    }
+                }
+
             }
 
             click_handler();
@@ -122,11 +130,15 @@ $(`button[id="poll-button"]`).on("click", async function() {
     
 });
 
-var single_voting_check = function() {
+var skipped_question = function() {
+    $(`button[id="poll-button"]`).trigger("click");
+}
+
+var multi_voting_check = function() {
     if($(`input[name="multipleVoting"]`).length) {
         let value = $(`input[name="multipleVoting"]`).val();
         if(value == "No") {
-            let user_guid = guid();
+            let user_guid = guid() + "_" + $(`input[name="ipAddress"]`).val();
             if($.inArray(user_guid, votersGUID) !== -1) {
                 $(`button[id="poll-button"]`).remove();
                 $(`div[class="percentage"]`).html(`
@@ -135,4 +147,4 @@ var single_voting_check = function() {
         }
     }
 }
-single_voting_check();
+multi_voting_check();

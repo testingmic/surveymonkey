@@ -113,6 +113,10 @@ iframe {
     max-width: 100%
 }
 
+.cursor {
+    cursor: pointer;
+}
+
 i.fa {
     display: inline-block;
     line-height: inherit

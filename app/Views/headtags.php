@@ -22,7 +22,7 @@ $isLoggedIn = !empty($sessObj->_userApiToken) && !empty($sessObj->_schoolId) && 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="icon" type="image/png" href="<?= $baseURL ?>assets/images/favicon.png">
+    <link rel="icon" type="image/jpeg" href="<?= $baseURL ?>assets/images/favicon.jpg">
     <title><?= $pagetitle ?? "Home" ?> - <?= $AppName ?? null ?></title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -31,6 +31,6 @@ $isLoggedIn = !empty($sessObj->_userApiToken) && !empty($sessObj->_schoolId) && 
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/fontawesome.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/toastr.css">
-    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css?v=<?= rand(1, 1500) ?>">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css">
 </head>
 <body>
