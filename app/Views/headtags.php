@@ -31,6 +31,7 @@ $isLoggedIn = !empty($sessObj->_userApiToken) && !empty($sessObj->_schoolId) && 
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/fontawesome.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/toastr.css">
-    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css?v=<?= rand(1, 10) ?>">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/trix.css">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css?v=<?= rand(1, 5) ?>">
 </head>
 <body>

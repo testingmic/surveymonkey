@@ -316,8 +316,11 @@ time:hover {
 }
 
 .card {
-    max-width: 350px;
     margin: auto
+}
+
+.card-width {
+    max-width: 350px;
 }
 
 .card img,
@@ -380,7 +383,7 @@ p.alert {
 }
 
 .not-allowed {
-    cursor: grab!important;
+    cursor: grab !important;
 }
 
 .fluid-image {
@@ -394,7 +397,7 @@ p.alert {
     max-width: 550px;
 }
 
-@media (max-width:800px){
+@media (max-width:800px) {
 
     .fluid-image {
         max-height: 320px;
@@ -404,6 +407,7 @@ p.alert {
     .survey-header {
         padding: 0.4em 10px;
     }
+
     .survey-header .header-title {
         font-size: 22px;
         text-align: center;
@@ -452,7 +456,7 @@ p.alert {
     margin: 0;
     padding: 5px 10px;
     box-shadow: 0 0 0 1px #f0f1f4;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .questionnaire .question label {
@@ -508,57 +512,79 @@ p.alert {
     width: 400px;
 }
 
-@media (max-width:800px){
+@media (max-width:800px) {
     .fluid-image img {
         max-width: 80%;
     }
+
     .survey_analytic .progress-bar-container .progress-bar {
         width: 250px;
     }
 }
 
-@media (max-width:650px){
+@media (max-width:650px) {
     .fluid-image img {
         max-width: 100%;
     }
+
     .survey_analytic .progress-bar-container .progress-bar {
         width: 200px;
     }
 }
 
-@media (max-width:450px){
+@media (max-width:450px) {
     .survey_analytic .progress-bar-container .progress-bar {
         width: 150px;
     }
 }
 
-@media (max-width:380px){
+@media (max-width:380px) {
     .survey_analytic .progress-bar-container .progress-bar {
         width: 120px;
     }
 }
 
 .shaking {
-    animation: shaking 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    animation: shaking 0.82s cubic-bezier(.36, .07, .19, .97) both;
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
     perspective: 1000px;
-  }
-  
-  @keyframes shaking {
-    10%, 90% {
-      transform: translate3d(-1px, 0, 0);
+}
+
+@keyframes shaking {
+
+    10%,
+    90% {
+        transform: translate3d(-1px, 0, 0);
     }
-    
-    20%, 80% {
-      transform: translate3d(2px, 0, 0);
+
+    20%,
+    80% {
+        transform: translate3d(2px, 0, 0);
     }
-  
-    30%, 50%, 70% {
-      transform: translate3d(-4px, 0, 0);
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-4px, 0, 0);
     }
-  
-    40%, 60% {
-      transform: translate3d(4px, 0, 0);
+
+    40%,
+    60% {
+        transform: translate3d(4px, 0, 0);
     }
-  }
+}
+
+.min-150 {
+    min-width: 100px;
+}
+
+trix-editor {
+    min-height: 180px!important;
+    max-height: 500px!important;
+}
+
+trix-editor.short-height {
+    min-height: 100px!important;
+    max-height: 200px!important;
+}

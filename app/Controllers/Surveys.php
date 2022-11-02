@@ -16,6 +16,7 @@ class Surveys extends AppController {
 
         $data = [];
         $data['isFound'] = false;
+        $data['slug'] = null;
         if( $slug == 'add') {
             $data['pagetitle'] = "New Survey";
         }
@@ -32,7 +33,10 @@ class Surveys extends AppController {
                 return $this->show_display('not_found');
             }
 
-            $data['pagetitle'] = $survey['title'];
+            $data['survey'] = $survey;
+            $data['slug'] = $slug;
+            $data['pagetitle'] = $data['survey']['title'];
+            $data['survey']['settings'] = json_decode($data['survey']['settings'], true);
             $data['isFound'] = true;
         }
 
@@ -460,6 +464,21 @@ class Surveys extends AppController {
         // return the response
         return $this->api_response(['code' => 200, 'result' => $question, 'additional' => $additional]);
 
+    }
+
+    /**
+     * Save Survey
+     * 
+     * @param Array     $this->request->getPost()
+     * 
+     * @return Array
+     */
+    public function save() {
+        
+        $params = array_map('esc', $this->request->getPost());
+
+        return $this->error('Pending processing');
+        
     }
 
 }

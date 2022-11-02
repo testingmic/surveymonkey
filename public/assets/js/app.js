@@ -1,5 +1,4 @@
 var surveyResults;
-
 var Notify = (message, theme = "danger", icon = 'fa-bell-o') => {
     toastr.options.positionClass = 'toast-top-right';
     toastr.options.extendedTimeOut = 0;

@@ -4,7 +4,7 @@ $pagetitle = "Survey Not Found (404)";
 include_once 'headtags.php';
 ?>
 <div class='dialog-container'>
-    <div class='card'>
+    <div class='card card-width'>
         <div class='card-content'>
             <img width="560" height="199" src="<?= $baseURL ?>assets/images/notfound.png" />
             <h3><?= $pagetitle ?></h3>

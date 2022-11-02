@@ -23,10 +23,10 @@ include_once 'headtags.php';
                         <div class="card-header">
                             <?= $survey['title'] ?>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body bg-white">
                             <img width="100%" src="<?= $baseURL . $survey['cover_art'] ?>" alt="">
                             <div>
-                                <?= character_limiter(strip_tags($survey['description']), 150) ?>
+                                <?= character_limiter(strip_tags($survey['description']), 160) ?>
                             </div>
                             <div class="mt-2">
                                 <small>
