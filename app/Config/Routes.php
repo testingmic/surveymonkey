@@ -35,6 +35,7 @@ $routes->get('/', 'Home::index');
 $routes->get('/embed', 'Surveys::embed');
 $routes->get('/embed/(:any)', 'Surveys::embed/$1/$2');
 $routes->post('/surveys/show_question', 'Surveys::question');
+$routes->get('/surveys/results(:any)', 'Surveys::results');
 
 // command line commands
 $routes->cli('root/(:any)', 'Crontab::jobs/$1');

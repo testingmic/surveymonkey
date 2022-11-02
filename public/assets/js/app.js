@@ -161,3 +161,10 @@ var multi_voting_check = function() {
     }
 }
 multi_voting_check();
+
+if($(`input[name="surveyAnalytic"]`).length) {
+    let data = $(`input[name="surveyAnalytic"]`).data();
+    $.get(`${baseURL}surveys/results`, data).then((response) => {
+
+    });
+}

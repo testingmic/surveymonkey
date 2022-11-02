@@ -111,18 +111,35 @@ class SurveysController extends AccessBridge {
             $data = !empty($result) ? $result->getResultArray() : [];
 
             // if the loaddata was parsed and the primary key is not empty
-            if( !empty($primary_key) || !empty($params['append_questions'])) {
-                // convert the item into an array
-                $n_data = [];
-                foreach($data as $key => $item) {
-                    $item['questions'] = $this->db_model->db->table('surveys_questions')
-                                                    ->where([
-                                                        'survey_id' => $item['id'], 'client_id' => $item['client_id'], 
-                                                        'status !=' => '0'
-                                                    ])->limit(200)->get()->getResultArray();
-                    $n_data[] = $item;
+            if( !empty($data)) {
+
+                if(!empty($params['append_questions'])) {
+                    // convert the item into an array
+                    $n_data = [];
+                    foreach($data as $key => $item) {
+                        $item['questions'] = $this->db_model->db->table('surveys_questions')
+                                                ->where([
+                                                    'survey_id' => $item['id'], 'client_id' => $item['client_id'], 
+                                                    'status !=' => '0'
+                                                ])->limit(200)->get()->getResultArray();
+                        $n_data[] = $item;
+                    }
+                    $data = $n_data;
                 }
-                $data = $n_data;
+
+                if(!empty($params['append_votes'])) {
+                    // convert the item into an array
+                    $n_data = [];
+                    foreach($data as $key => $item) {
+                        $item['votes'] = $this->db_model->db->table('surveys_votes')
+                                                ->where([
+                                                    'survey_id' => $item['id']
+                                                ])->limit(200)->get()->getResultArray();
+                        $n_data[] = $item;
+                    }
+                    $data = $n_data;
+                }
+                
             }
 
             return $data;

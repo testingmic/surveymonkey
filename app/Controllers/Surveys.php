@@ -12,14 +12,16 @@ class Surveys extends AppController {
      * 
      * @return Mixed
      */
-    public function embed($slug = null) {
+    public function embed($slug = null, $request = null) {
 
         if( empty($slug) ) {
             return $this->show_display('not_found');
         }
 
+        $param = ['slug' => $slug, 'append_questions' => true];
+
         // get the clients and web statistics list
-        $data['survey'] = $this->api_lookup('GET', 'surveys', ['slug' => $slug, 'append_questions' => true])[0] ?? [];
+        $data['survey'] = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
 
         if(empty($data['survey'])) {
             return $this->show_display('not_found');
@@ -37,29 +39,134 @@ class Surveys extends AppController {
             $data['survey']['questions'] = $questions;
         }
 
-        // force refresh
-        if( !empty($this->sessObject->forceRefresh) ) {
-            $this->sessObject->remove(['surveyAnswers', 'initSurvey', 'firstQuestion', 'nextQuestion', 'forceRefresh']);
+        $isResult = (bool) ($request == "results");
+        
+        $data['votersGUID'] = [];
+        $data['surveySlug'] = $slug;
+        $data['isResult'] = $isResult;
+
+        // if the request is not equal to results
+        if(!$isResult) {
+
+            // force refresh
+            if( !empty($this->sessObject->forceRefresh) ) {
+                $this->sessObject->remove(['surveyAnswers', 'initSurvey', 'firstQuestion', 'nextQuestion', 'forceRefresh']);
+            }
+
+            // next question
+            $data['isContinue'] = (bool) !empty($this->sessObject->nextQuestion);
+
+            // save the question slug in session
+            $this->sessObject->set([
+                'surveyId' => $data['survey']['id'], 
+                'surveySlug' => $slug, 
+                'surveyQuestions' => $data['survey']
+            ]);
+
+            // allow multiple voting
+            $data['multipleVoting'] = (bool) !empty($data['survey']['settings']['allow_multiple_voting']) ? "Yes" : "No";
+            $users = !empty($data['survey']['users_logs']) ? json_decode($data['survey']['users_logs'], true) : [];
+            $data['votersGUID'] = !empty($users) ? array_column($users, 'guid') : [];
+            $data['ip_address'] = $this->request->getIPAddress();
+
         }
-
-        // next question
-        $data['isContinue'] = (bool) !empty($this->sessObject->nextQuestion);
-
-        // save the question slug in session
-        $this->sessObject->set([
-            'surveyId' => $data['survey']['id'], 
-            'surveySlug' => $slug, 
-            'surveyQuestions' => $data['survey']
-        ]);
-
-        // allow multiple voting
-        $data['multipleVoting'] = (bool) !empty($data['survey']['settings']['allow_multiple_voting']) ? "Yes" : "No";
-        $users = !empty($data['survey']['users_logs']) ? json_decode($data['survey']['users_logs'], true) : [];
-        $data['votersGUID'] = !empty($users) ? array_column($users, 'guid') : [];
-        $data['ip_address'] = $this->request->getIPAddress();
 
         // display the page
         return $this->show_display('embed', $data);
+    }
+
+    /**
+     * Prepare and return the survey results
+     * 
+     * @return Array
+     */
+    public function results() {
+
+        $slug = $this->request->getGet('survey_slug');
+
+        if(empty($slug)) {
+            return $this->error($this->not_found_text());
+        }
+
+        $param = ['slug' => $slug, 'append_questions' => true, 'append_votes' => true];
+
+        // get the clients and web statistics list
+        $survey = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
+
+        // return the results
+        if(empty($survey)) {
+            return $this->error($this->not_found_text());
+        }
+
+        $result = [];
+        $result['summary']['votes_count'] = (int) $survey['submitted_answers'];
+        $result['summary']['questions_count'] = count($survey['questions']);
+
+        function regroup_keys($array = []) {
+            if( empty($array) ) {
+                return [];
+            }
+
+            foreach($array as $key => $value) {
+                $data[$key + 1] = $value;
+            }
+
+            return $data ?? [];
+        }
+
+        $quest = [];
+        foreach($survey['questions'] as $question) {
+            $quest[$question['id']] = [
+                'title' => $question['title'],
+                'type' => $question['answer_type'],
+                'options' => regroup_keys(json_decode($question['options'], true))
+            ];
+            $question_id = (int) $question['id'];
+            $quest[$question['id']]['answers'] = array_filter($survey['votes'], function($votes) use($question_id) {
+                if((int) $votes['question_id'] == $question_id) {
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        function combine_array($array_keys = [], $array_values = [], $total) {
+            $combine = [];
+            foreach($array_keys as $key => $value) {
+                
+                $count = $array_values[$key] ?? 0;
+                $combine[$value]['count'] = $count;
+                $combine[$value]['percentage'] = empty($count) ? 0 : (round(($count / $total) * 100, 2));
+            }
+            return $combine;
+        }
+
+        $questions = [];
+        $votes_count = $result['summary']['votes_count'];
+        foreach($quest as $id => $item) {
+            $ikey = array_key_first($item['answers']);
+            $item['counts'] = json_decode($item['answers'][$ikey]['votes'], true);
+            $item['grouping'] = combine_array($item['options'], $item['counts'], $votes_count);
+            $item['votes_cast'] = array_sum(array_column($item['grouping'], 'count'));
+
+            if($item['votes_cast'] !== $votes_count) {
+                $skipped = $votes_count - $item['votes_cast'];
+                $item['grouping']['skipped'] = [
+                    'count' => $skipped,
+                    'percentage' => empty($skipped) ? 0 : (round(($skipped / $votes_count) * 100, 2))
+                ];
+            }
+
+            unset($item['counts']);
+            unset($item['answers']);
+
+            $questions[$id] = $item;
+        }
+
+        $result['questions'] = $questions;
+        
+        return $this->error($result);
+
     }
 
     /**
