@@ -9,7 +9,7 @@ include_once 'headtags.php';
     </div>
     <div class="survey-content">
         <div class="survey-body">
-            <?php if( !empty($survey['cover_art']) ) { ?>
+            <?php if (!empty($survey['cover_art'])) { ?>
                 <div class="fluid-image">
                     <img src="<?= $baseURL . $survey['cover_art'] ?>" alt="">
                 </div>
@@ -18,8 +18,10 @@ include_once 'headtags.php';
         </div>
         <div class="text-center mt-3">
             <button id="poll-button" data-default="<?= $survey['button_text'] ?>" class="btn btn-success begin-button">
-                <?= $survey['button_text'] ?>
+                <?= $isContinue ? "Continue" : $survey['button_text'] ?>
             </button>
+            <div class="percentage"></div>
+            <input type="hidden" name="proceed_to_load" value="continue">
         </div>
     </div>
 </div>

@@ -370,7 +370,8 @@ p.alert {
 .begin-button {
     font-family: var(--playful-font-family);
     font-size: 20px;
-    width: 150px;
+    min-width: 150px;
+    max-width: 250px;
 }
 
 .not-allowed {
@@ -470,3 +471,67 @@ p.alert {
 .styled {
     margin-right: 5px;
 }
+
+.percentage {
+    margin-top: 20px;
+}
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 32px;
+    margin-bottom: 10px;
+}
+
+.progress-bar-container .progress-bar {
+    position: relative;
+    width: 250px;
+    height: 18px;
+    border-radius: 3px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
+    background: #fefefe;
+    border: 1px solid #f0f1f4;
+    padding: 1px;
+}
+
+.progress-bar-container .progress-bar-completed {
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #e9ce26;
+    border-radius: 3px;
+}
+
+.progress-bar-container .progress-bar-percentage {
+    font-size: 0.6875rem;
+    color: grey;
+    line-height: 0;
+    white-space: nowrap;
+    padding-inline-start: 8px;
+}
+
+.shaking {
+    animation: shaking 0.82s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+  
+  @keyframes shaking {
+    10%, 90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+    
+    20%, 80% {
+      transform: translate3d(2px, 0, 0);
+    }
+  
+    30%, 50%, 70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+  
+    40%, 60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }

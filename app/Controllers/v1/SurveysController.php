@@ -133,4 +133,75 @@ class SurveysController extends AccessBridge {
 
     }
 
+    /**
+     * Cast Votes
+     * 
+     * @param Int       $survey_id
+     * @param Array     $votes
+     */
+    public function castvotes(array $params = []) {
+
+        if(empty($params['survey_id'])) {
+            return $this->record_not_found;
+        }
+
+        if(empty($params['votes']) || ( !empty($params['votes']) && !is_array($params['votes']))) {
+            return 'The votes is required and must be a valid array.';
+        }
+
+        $survey = $this->list([], $params['survey_id']);
+
+        if(empty($survey)) {
+            return $this->record_not_found;
+        }
+
+        $votes = $this->db_model->db->table('surveys_votes')
+                                ->where([
+                                    'survey_id' => $params['survey_id']
+                                ])->limit(100)->get()->getResultArray();
+
+        foreach($params['votes'] as $vote) {
+            
+            $votes_cast = [];
+            $def_question = $vote['question'];
+            $question = array_filter($votes, function($eachvote) use($def_question) {
+                if($eachvote['question_id'] == $def_question) {
+                    return true;
+                }
+                return false;
+            });
+            
+            if(empty($question)) {
+                $votes_cast[$vote['choice']] = 1;
+
+                $this->db_model->db->table('surveys_votes')->insert([
+                    'survey_id' => $params['survey_id'], 'question_id' => $vote['question'],
+                    'votes' => json_encode($votes_cast)
+                ]);
+            } else {
+                $array_key = array_key_first($question);
+                $casted = json_decode($question[$array_key]['votes'], true);
+                $casted[$vote['choice']] = isset($casted[$vote['choice']]) ? ($casted[$vote['choice']] + 1) : 1;
+                
+                $this->db_model->db->table('surveys_votes')->update(
+                    ['votes' => json_encode($casted)],
+                    ['survey_id' => $params['survey_id'], 'question_id' => $vote['question']], 1
+                );
+            }
+        }
+
+        $this->db_model->db->query("
+            UPDATE 
+                surveys 
+            SET 
+                submitted_answers = (submitted_answers + 1) 
+            WHERE 
+                id='{$params['survey_id']}'
+            LIMIT 1
+        ");
+
+        return 'votes_logged_successfully';
+
+    }
+
 }

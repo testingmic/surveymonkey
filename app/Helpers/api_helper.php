@@ -452,6 +452,15 @@ function array_data_column($array_list, $word, $match = 'name', $field = 'id') {
     return "";
 }
 
+function array_column_key($array_list, $word, $match = 'name') {
+    foreach($array_list as $key => $row) {
+        if($row[$match] == $word) {
+            return $key;
+        }
+    }
+    return "";
+}
+
 /**
  * Loop through the array and get the keys with values only
  * 

@@ -25,15 +25,30 @@ var click_handler = () => {
 }
 
 var selectnotice = (msg) => {
-    $(`div[class='select-notice']`).html(`<div class="text-danger"><i class="fa fa-info-circle"></i> ${msg}</div>`);
+    $(`button[id="poll-button"]`).addClass('shaking');
+    $(`div[class='select-notice']`).html(`<div class="text-danger shaking"><i class="fa fa-info-circle"></i> ${msg}</div>`);
+    setTimeout(() => {
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+    }, 500);
 }
 
-$(`button[id="poll-button"]`).on("click", () => {
+var refresh_handler = () => {
+    $.post(`${baseURL}surveys/show_question`, {refresh_poll: true}).then((response) => {
+        
+    });
+}
+
+$(`button[id="poll-button"]`).on("click", async function() {
 
     $(`div[class='select-notice']`).html(``);
+    $(`button[id="poll-button"]`).removeClass('shaking');
 
     let data = {};
     
+    if($(`input[name="proceed_to_load"]`).val() == 'poll-refresh') {
+        refresh_handler();
+    }
+
     if($(`input[name='is_required']`).length) {
         let selected_option = $(`input[name='question[choice_id]']:checked`);
         if( !selected_option.length && $(`input[name='is_required']`).val() == 1) {
@@ -52,9 +67,7 @@ $(`button[id="poll-button"]`).on("click", () => {
         }
     }
 
-    $(`button[id="poll-button"]`)
-        .attr({'disabled': true})
-        .html(`<i class="fa fa-spin fa-spinner"></i>`);
+    $(`button[id="poll-button"]`).attr({'disabled': true}).html(`<i class="fa fa-spin fa-spinner"></i>`);
 
     $(`div[class='select-notice']`).html(``);
 
@@ -64,11 +77,24 @@ $(`button[id="poll-button"]`).on("click", () => {
             reset_button();
         } else {
             $(`div[class="survey-content"] div[class="survey-body"]`).html(response.data.result);
-            reset_button("Continue");
+
+            if(response.data.additional !== undefined) {
+                if(response.data.additional.percentage !== undefined) {
+                    $(`div[class="percentage"]`).html(response.data.additional.percentage);
+                }
+            }
+            reset_button(response.data.additional.button_text);
+
+            if(response.data.additional.button_id !== undefined) {
+                $(`input[name="proceed_to_load"]`).val(response.data.additional.button_id);
+            } else {
+                $(`input[name="proceed_to_load"]`).val('continue');
+            }
             click_handler();
         }
     }).fail((err) => {
         Notify('Sorry! An unexpected error was encountered.');
         setTimeout(() => { reset_button(); }, 1000);
     });
+    
 });

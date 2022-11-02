@@ -11,6 +11,8 @@ class Home extends AppController {
 
         // get list of all clients
         $this->generalApi = true;
+
+        prep($_SESSION['surveyAnswers'] ?? []);
         
         // get the clients and web statistics list
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys') ?? [];
