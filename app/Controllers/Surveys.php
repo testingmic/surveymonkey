@@ -39,7 +39,7 @@ class Surveys extends AppController {
 
         // force refresh
         if( !empty($this->sessObject->forceRefresh) ) {
-            $this->sessObject->remove(['surveyAnswers', 'firstQuestion', 'nextQuestion']);
+            $this->sessObject->remove(['surveyAnswers', 'firstQuestion', 'nextQuestion', 'forceRefresh']);
         }
 
         // next question
@@ -51,6 +51,11 @@ class Surveys extends AppController {
             'surveySlug' => $slug, 
             'surveyQuestions' => $data['survey']
         ]);
+
+        // allow multiple voting
+        $data['multipleVoting'] = (bool) !empty($data['survey']['settings']['allow_multiple_voting']) ? "Yes" : "No";
+        $users = !empty($data['survey']['users_logs']) ? json_decode($data['survey']['users_logs'], true) : [];
+        $data['votersGUID'] = !empty($users) ? array_column($users, 'guid') : [];
 
         // display the page
         return $this->show_display('embed', $data);
@@ -132,7 +137,7 @@ class Surveys extends AppController {
             // options
             $options = !empty($quest['options']) ? json_decode($quest['options'], true) : [];
 
-            if(!isset($options[$choice_id])) {
+            if(!isset($options[($choice_id-1)])) {
                 return $this->error('The selected option is not valid.');
             }
 
@@ -241,6 +246,13 @@ class Surveys extends AppController {
             return $html;
         }
 
+        // get the user agent
+        $userAgent = $this->request->getUserAgent();
+            
+        // set the user agent
+        $user_agent = $userAgent->__toString();
+        $ip_address = $this->request->getIPAddress();
+
         $additional = [];
 
         if( ($questionId !== 'final') ) {
@@ -252,13 +264,15 @@ class Surveys extends AppController {
 
             $percentage = round(($answersCount / $questionsCount) * 100);
 
-
             $additional['percentage'] = '
             <div class="progress-bar-container">
                 <div class="progress-bar">
                     <div class="progress-bar-completed" style="width: '.$percentage.'%;"></div>
                 </div>
                 <div class="progress-bar-percentage">'.$percentage.'% completed</div>
+            </div>
+            <div class="useripaddress text-center">
+                '.$ip_address.'
             </div>';
 
             $additional['button_text'] = "Continue";
@@ -267,10 +281,15 @@ class Surveys extends AppController {
 
             // save the user responses into the database
             $votesObject = new \App\Controllers\v1\SurveysController();
-            $vote = $votesObject->castvotes(['survey_id' => $this->sessObject->surveyId, 'votes' => $theAnswers]);
+            $vote = $votesObject->castvotes([
+                'survey_id' => $this->sessObject->surveyId, 
+                'votes' => $theAnswers,
+                'ip_address' => $ip_address,
+                'guid' => $params['guid'] ?? null,
+            ]);
 
             // if not successful
-            if( $vote !== 'votes_logged_successfully') {
+            if( !isset($vote['status'])) {
                 return $vote;
             }
 
@@ -283,6 +302,7 @@ class Surveys extends AppController {
                 </div>
             </div>";
             $additional['percentage'] = "";
+            $additional['guids'] = $vote['guid'];
             $additional['button_id'] = "poll-refresh";
             $additional['button_text'] = $multipleVoting ? "<i class='fa fa-dice-d6'></i> Cast Another Vote" : "<i class='fa fa-compress-arrows-alt'></i> Complete";
 

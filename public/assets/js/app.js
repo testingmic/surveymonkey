@@ -38,12 +38,28 @@ var refresh_handler = () => {
     });
 }
 
+var guid = function() {
+    var nav = window.navigator;
+    var screen = window.screen;
+    var guid = "";
+    guid += nav.userAgent.replace(/\D+/g, '');
+    guid += screen.height || '';
+    guid += screen.width || '';
+    guid += screen.pixelDepth || '';
+
+    let user_guid = guid.substring(0, 10) + "" + guid.substring(guid.length - 10);
+
+    return user_guid;
+};
+
 $(`button[id="poll-button"]`).on("click", async function() {
 
     $(`div[class='select-notice']`).html(``);
     $(`button[id="poll-button"]`).removeClass('shaking');
 
     let data = {};
+
+    single_voting_check();
     
     if($(`input[name="proceed_to_load"]`).val() == 'poll-refresh') {
         refresh_handler();
@@ -62,6 +78,7 @@ $(`button[id="poll-button"]`).on("click", async function() {
         }
 
         data = {
+            guid: guid(),
             choice_id: selected_option.val(),
             question_id: $(`input[name='question[questionId]']`).val()
         }
@@ -82,14 +99,20 @@ $(`button[id="poll-button"]`).on("click", async function() {
                 if(response.data.additional.percentage !== undefined) {
                     $(`div[class="percentage"]`).html(response.data.additional.percentage);
                 }
-            }
-            reset_button(response.data.additional.button_text);
+                reset_button(response.data.additional.button_text);
 
-            if(response.data.additional.button_id !== undefined) {
-                $(`input[name="proceed_to_load"]`).val(response.data.additional.button_id);
-            } else {
-                $(`input[name="proceed_to_load"]`).val('continue');
+                if(response.data.additional.button_id !== undefined) {
+                    $(`input[name="proceed_to_load"]`).val(response.data.additional.button_id);
+                } else {
+                    $(`input[name="proceed_to_load"]`).val('continue');
+                }
+
+                if(response.data.additional.guids !== undefined) {
+                    votersGUID = response.data.additional.guids;
+                } 
+
             }
+
             click_handler();
         }
     }).fail((err) => {
@@ -98,3 +121,18 @@ $(`button[id="poll-button"]`).on("click", async function() {
     });
     
 });
+
+var single_voting_check = function() {
+    if($(`input[name="multipleVoting"]`).length) {
+        let value = $(`input[name="multipleVoting"]`).val();
+        if(value == "No") {
+            let user_guid = guid();
+            if($.inArray(user_guid, votersGUID) !== -1) {
+                $(`button[id="poll-button"]`).remove();
+                $(`div[class="percentage"]`).html(`
+                <button class="btn btn-success begin-button">One vote allowed!</button>`);
+            }
+        }
+    }
+}
+single_voting_check();

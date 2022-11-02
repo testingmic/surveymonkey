@@ -155,10 +155,30 @@ class SurveysController extends AccessBridge {
             return $this->record_not_found;
         }
 
+        // get the logged users list
+        $users = !empty($survey[0]['users_logs']) ? json_decode($survey[0]['users_logs'], true) : [];
+        $guids = !empty($users) ? array_column($users, 'guid') : [];
+        
+        // convert the settings to an array
+        $survey['settings'] = json_decode($survey[0]['settings'], true);
+
+        // if allow multiple voting
+        if(empty($survey['settings']['allow_multiple_voting'])) {
+            if(in_array($params['guid'], $guids)) {
+                return 'Sorry! You are only allowed to vote once.';
+            }
+        }
+
+        if(!in_array($params['guid'], $guids)) {
+            $users[] = [
+                'guid' => $params['guid'],
+                'ipaddress' => $params['ip_address']
+            ];
+        }
+
+        // get the votes for this survey
         $votes = $this->db_model->db->table('surveys_votes')
-                                ->where([
-                                    'survey_id' => $params['survey_id']
-                                ])->limit(100)->get()->getResultArray();
+                                ->where(['survey_id' => $params['survey_id']])->limit(100)->get()->getResultArray();
 
         foreach($params['votes'] as $vote) {
             
@@ -194,13 +214,17 @@ class SurveysController extends AccessBridge {
             UPDATE 
                 surveys 
             SET 
-                submitted_answers = (submitted_answers + 1) 
+                submitted_answers = (submitted_answers + 1), users_logs = '".json_encode($users)."'
             WHERE 
                 id='{$params['survey_id']}'
             LIMIT 1
         ");
 
-        return 'votes_logged_successfully';
+        // remove the session variables
+        session()->remove(['surveyAnswers', 'firstQuestion', 'nextQuestion']);
+        session()->set(['initSurvey' => true]);
+
+        return ['status' => 'votes_logged_successfully', 'guid' => array_column($users, 'guid')];
 
     }
 

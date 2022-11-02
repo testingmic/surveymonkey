@@ -21,8 +21,10 @@ include_once 'headtags.php';
                 <?= $isContinue ? "Continue" : $survey['button_text'] ?>
             </button>
             <div class="percentage"></div>
-            <input type="hidden" name="proceed_to_load" value="continue">
+            <input type="hidden" disabled name="multipleVoting" value="<?= $multipleVoting ?>">
+            <input type="hidden" disabled name="proceed_to_load" value="continue">
         </div>
     </div>
 </div>
+<script>var votersGUID = <?= json_encode($votersGUID) ?>;</script>
 <?php include_once 'foottags.php'; ?>
