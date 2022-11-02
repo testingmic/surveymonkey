@@ -3,7 +3,7 @@ include_once 'headtags.php';
 ?>
 <div class="survey-container">
     <div class="survey-header">
-        <div class="header-title">
+        <div class="<?= $isResult ? "container" : "header-title"; ?>">
             <?= $survey['title'] ?> <?= $isResult ? " - Results" : null ?>
         </div>
     </div>
@@ -34,7 +34,23 @@ include_once 'headtags.php';
             </div>
         <?php } else { ?>
             <input type="hidden" name="surveyAnalytic" data-survey_slug="<?= $survey['slug'] ?>" data-survey_id="<?= $survey['id'] ?>" disabled>
+            <div class="container p-3 survey_analytic">
+                <div class="row">
+                    <div class="col-md-9"><h5>Survey Report</h5></div>
+                    <div class="col-md-3">
+                        <label for="">Select Question</label>
+                        <select name="question_id" id="question_id" class="selectpicker form-control"></select>
+                    </div>
 
+                    <div class="col-lg-12 mt-3">
+                        
+                        <div class="pt-2 mb-3" id="survey_question"></div>
+
+                        <div class="border-top border-primary pt-2" id="answer_question"></div>
+
+                    </div>
+                </div>
+            </div>
         <?php } ?>
     </div>
 </div>

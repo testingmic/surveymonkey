@@ -395,18 +395,6 @@ p.alert {
 }
 
 @media (max-width:800px){
-    .fluid-image img {
-        max-width: 80%;
-    }
-}
-
-@media (max-width:500px){
-    .fluid-image img {
-        max-width: 100%;
-    }
-}
-
-@media (max-width:800px){
 
     .fluid-image {
         max-height: 320px;
@@ -514,6 +502,40 @@ p.alert {
     line-height: 0;
     white-space: nowrap;
     padding-inline-start: 8px;
+}
+
+.survey_analytic .progress-bar-container .progress-bar {
+    width: 400px;
+}
+
+@media (max-width:800px){
+    .fluid-image img {
+        max-width: 80%;
+    }
+    .survey_analytic .progress-bar-container .progress-bar {
+        width: 250px;
+    }
+}
+
+@media (max-width:650px){
+    .fluid-image img {
+        max-width: 100%;
+    }
+    .survey_analytic .progress-bar-container .progress-bar {
+        width: 200px;
+    }
+}
+
+@media (max-width:450px){
+    .survey_analytic .progress-bar-container .progress-bar {
+        width: 150px;
+    }
+}
+
+@media (max-width:380px){
+    .survey_analytic .progress-bar-container .progress-bar {
+        width: 120px;
+    }
 }
 
 .shaking {

@@ -6,6 +6,40 @@ class Surveys extends AppController {
     private $invalid_question = 'Sorry! The question id parsed could not be found in this survey.';
 
     /**
+     * Create and Modify an Existing survey
+     * 
+     * @param String        $slug
+     * @param String        $request
+     * 
+     */
+    public function modify($slug = null, $request = null, $page = null) {
+
+        $data = [];
+        $data['isFound'] = false;
+        if( $slug == 'add') {
+            $data['pagetitle'] = "New Survey";
+        }
+
+        elseif($request == 'edit') {
+            // get the survey
+            $param = ['slug' => $slug, 'append_questions' => true];
+
+            // get the clients and web statistics list
+            $survey = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
+
+            // return the results
+            if(empty($survey)) {
+                return $this->show_display('not_found');
+            }
+
+            $data['pagetitle'] = $survey['title'];
+            $data['isFound'] = true;
+        }
+
+        return $this->show_display('survey', $data);
+    }
+
+    /**
      * Embed the Survey Question
      * 
      * @param String    $slug
@@ -136,7 +170,7 @@ class Surveys extends AppController {
                 
                 $count = $array_values[$key] ?? 0;
                 $combine[$value]['count'] = $count;
-                $combine[$value]['percentage'] = empty($count) ? 0 : (round(($count / $total) * 100, 2));
+                $combine[$value]['percentage'] = empty($count) ? 0 : (round(($count / $total) * 100));
             }
             return $combine;
         }
@@ -153,7 +187,7 @@ class Surveys extends AppController {
                 $skipped = $votes_count - $item['votes_cast'];
                 $item['grouping']['skipped'] = [
                     'count' => $skipped,
-                    'percentage' => empty($skipped) ? 0 : (round(($skipped / $votes_count) * 100, 2))
+                    'percentage' => empty($skipped) ? 0 : (round(($skipped / $votes_count) * 100))
                 ];
             }
 
@@ -164,8 +198,9 @@ class Surveys extends AppController {
         }
 
         $result['questions'] = $questions;
+        $result['first_question'] = array_key_first($questions);
         
-        return $this->error($result);
+        return $this->api_response(['code' => 200, 'result' => $result]);
 
     }
 
