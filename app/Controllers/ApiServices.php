@@ -204,9 +204,7 @@ class ApiServices extends BaseController {
 					$params['_userData'] = $validate;
 
 					// if the general api request is empty then dont save the value in session
-					if( empty($this->generalApi) ) {
-						$session->set(['_userData' => $params['_userData']]);
-					}
+					$session->set(['_userData' => $params['_userData']]);
 				}
 			
 			}

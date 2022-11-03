@@ -16,7 +16,9 @@ class Home extends AppController {
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys');
         
         try {
+            
             return $this->show_display('index', $data);
+
         } catch(\Exception $e) {
             return $e->getMessage();
         }
