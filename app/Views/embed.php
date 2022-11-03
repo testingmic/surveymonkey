@@ -41,13 +41,9 @@ include_once 'headtags.php';
                         <label for="">Select Question</label>
                         <select name="question_id" id="question_id" class="selectpicker form-control"></select>
                     </div>
-
                     <div class="col-lg-12 mt-3">
-                        
                         <div class="pt-2 mb-3" id="survey_question"></div>
-
                         <div class="border-top border-primary pt-2" id="answer_question"></div>
-
                     </div>
                 </div>
             </div>

@@ -549,15 +549,19 @@ function selected_answer($questionId = null, $theAnswers = []) {
  * Format the question to be displayed
  * 
  * @param Array     $question
+ * @param String    $answer
+ * @param Bool      $show_edit
+ * @param Bool      $show_border
  * 
  * @return Array 
  */
-function format_question($question, $answer = null, $show_edit = false) {
+function format_question($question, $answer = null, $show_edit = false, $show_border = true) {
     
     $questionOption = !empty($question['options']) ? json_decode($question['options'], true) : [];
 
-    $html = "
-    <div class='questionnaire position-relative mt-3' data-question_id='{$question['id']}'>
+    $html = $show_border ? "<div class='questionnaire position-relative mt-3' data-question_id='{$question['id']}'>" : null;
+
+    $html .= "
         <div class='hovercontrol' data-item='hover'>
             <div class='question' data-question_id='{$question['id']}'>
                 <div class='select-notice'></div>
@@ -603,9 +607,8 @@ function format_question($question, $answer = null, $show_edit = false) {
             </div>";
         }
 
-    $html .= "
-        </div>
-    </div>";
+    $html .= "</div>";
+    $html .= $show_border ? "</div>" : null;
     
     return $html;
 }

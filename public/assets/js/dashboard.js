@@ -152,6 +152,9 @@ var save_question = () => {
                     if(response.data.additional.href !== undefined) {
                         window.location.href = `${baseURL}${response.data.additional.href}`;
                     }
+                    if(response.data.additional.question) {
+                        $(`div[class~='questionnaire'][data-question_id='${selectedQuestion}']`).html(response.data.additional.question);
+                    }
                 }
             }
 

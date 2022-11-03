@@ -401,11 +401,48 @@ class SurveysController extends AccessBridge {
      * 
      * 
      */
-    public function updatequestion(array $params = []) {
+    public function updatequestion(array $params = [], $record_id = null) {
         
         try {
 
-            
+            $record_id = $params['question_id'] ?? null;
+
+            // permission check
+            $check = $this->permission_handler('questions', 'update', $params['_userData']);
+            if( empty($check) ) {
+                return $this->permission_denied;
+            }
+
+            $params['in_array_check'] = ['status' => [1, 2]];
+
+            // columns to validate
+            $params['column_validation'] = ['survey_id' => ['id', 'surveys']];
+
+            // perform a required validation
+            $params['required_validation'] = ['surveys_questions' => ['id' => $record_id, 'status !=' => '0']];
+
+            // validate the record set
+            $params = $this->dataValidationGrouping($this->db_model, $params, $this->parameters, ['client_id', 'created_by']);
+
+            if (!is_array($params)) {
+                return ['code' => 203, 'result' => $params];
+            }
+
+            if(isset($params['question_id'])) {
+                unset($params['question_id']);
+            }
+
+            $this->db_model->db->table('surveys_questions')->update($params, ['id' => $record_id], 1);
+
+            $result = $this->db_model->db
+                            ->table('surveys_questions a')
+                            ->select('a.*, (SELECT b.slug FROM surveys b WHERE b.id=a.survey_id LIMIT 1) AS slug')
+                            ->where(['id' => $record_id])
+                            ->limit(1)->get();
+
+            $check = !empty($result) ? $result->getResultArray() : [];
+
+            return ['code' => 200, 'result' => $check[0]];
 
         } catch(\Exception $e) {
             return $e->getMessage();

@@ -23,6 +23,7 @@
 				"instructions": "match_alphanum|max_length=1000",
 				"options": "max_length=2000",
 				"question_id": "match_num",
+				"is_required": "matches=0,1",
 				"survey_id": "required|match_num",
 				"title": "required|match_alphanum|max_length=500"
 			}
@@ -44,6 +45,7 @@
 				"instructions": "match_alphanum|max_length=1000",
 				"options": "max_length=2000",
 				"question_id": "match_num",
+				"is_required": "matches=0,1",
 				"survey_id": "required|match_num",
 				"title": "required|match_alphanum|max_length=500"
 			}

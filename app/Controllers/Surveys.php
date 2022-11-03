@@ -575,6 +575,10 @@ class Surveys extends AppController {
 
         $request = $this->api_lookup($method, $endpoint, $param);
 
+        if(isset($request['code']) && $request['code'] == 200) {
+            $request['additional']['question'] = format_question($request['result'], null, $request['result']['slug'], false);
+        }
+
         return $this->api_response($request, $method, "question");
 
     }

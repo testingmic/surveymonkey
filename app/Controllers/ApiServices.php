@@ -253,21 +253,5 @@ class ApiServices extends BaseController {
 		return $request;
 		
 	}
-
-    /**
-	 * Handle files attachment request using
-	 * 
-	 * Call $this->attach_file() if there are any files found in the property $this->files_array_list
-	 * 
-	 * @param String 		$endpoint
-	 * @param Array			$form_params
-	 * @param String		$token 			=> this is the user logged in token
-	 * 
-	 * @return Array
-	 */
-	public function postman_file($endpoint, $form_params, $token) {
-		
-		
-	}
     
 }
