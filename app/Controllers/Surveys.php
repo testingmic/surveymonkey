@@ -337,74 +337,6 @@ class Surveys extends AppController {
             return $this->error($this->invalid_question);
         }
 
-        /**
-         * Get the question answer
-         * 
-         * @param   Int     $questionId
-         * @param   Array   $theAnswers
-         * 
-         * @return String
-         */
-        function selected_answer($questionId = null, $theAnswers = []) {
-            if(is_null($theAnswers) || empty($questionId) || !is_array($theAnswers)) {
-                return null;
-            }
-
-            foreach($theAnswers as $answer) {
-                if($answer['question'] == $questionId) {
-                    return $answer['choice'];
-                }
-            }
-
-            return null;
-        }
-
-        /**
-         * Format the question to be displayed
-         * 
-         * @param Array     $question
-         * 
-         * @return Array 
-         */
-        function format_question($question, $answer = null) {
-            
-            $questionOption = !empty($question['options']) ? json_decode($question['options'], true) : [];
-
-            $html = "
-            <div class='questionnaire mt-3'>
-                <div class='question'>
-                    <div class='select-notice'></div>
-                    <div class='label-question mt-1'>
-                        ".(!empty($question['is_required']) ? "<span class='required'>*</span>" : null)."
-                        <span class='question-title'>{$question['title']}</span>
-                    </div>
-                    <div class='choices'>";
-
-                    foreach($questionOption as $key => $option) { 
-                        
-                        $key++;
-                        $html .= "
-                        <div class='single-choice'>
-                            <label class='choice choice-{$key}' for='form_choice_id{$key}'>
-                                <input ".(!is_null($answer) && ($answer == $key) ? "checked" : null)." class='styled' type='radio' value='{$key}' name='question[choice_id]' id='form_choice_id{$key}' />
-                                <label for='form_choice_id{$key}'>
-                                    <p>{$option}</p>
-                                </label>
-                            </label>
-                        </div>";
-
-                    }
-
-                $html .= "
-                    <input type='hidden' hidden name='question[questionId]' value='{$question['id']}' readonly>
-                    <input type='hidden' hidden name='is_required' value='{$question['is_required']}' readonly>
-                    </div>
-                </div>
-            </div>";
-            
-            return $html;
-        }
-
         // get the user agent
         $userAgent = $this->request->getUserAgent();
             
@@ -474,6 +406,100 @@ class Surveys extends AppController {
         // return the response
         return $this->api_response(['code' => 200, 'result' => $question, 'additional' => $additional]);
 
+    }
+
+    /**
+     * Load Question
+     * 
+     * @param String    $slug
+     * @param Int       $question_id
+     * 
+     * @return Array
+     */
+    public function loadquestion($slug, $question_id) {
+
+        $param = ['slug' => $slug, 'append_questions' => true];
+
+        // get the clients and web statistics list
+        $survey = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
+
+        if( empty($survey) ) {
+            return $this->error($this->not_found_text());
+        }
+
+        $question = array_filter($survey['questions'], function($quest) use($question_id) {
+            if($quest['id'] == $question_id) {
+                return true;
+            }
+            return false;
+        });
+        
+        if( empty($question) ) {
+            return $this->error($this->not_found_text("question"));
+        }
+
+        $key = array_key_first($question);
+        $question[$key]['options'] = json_decode($question[$key]['options'], true);
+
+        $question = $question[$key];
+
+        $form = '
+        <form method="POST" action="'.config('App')->baseURL.'" class="questionForm">
+            <div class="bg-light p-3">
+                <div class="form-group mb-2">
+                    <label for="">Question</label>
+                    <input value="'.($question['title'] ?? null).'" type="text" name="title" id="title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <span class="text-primary cursor">+ add instructions</span>
+                    <input type="" value="'.($question['instructions'] ?? null).'" name="instructions" id="instructions" class="form-control">
+                </div>
+                <div class="form-group mb-3 mt-3">
+                    <label for="">Question Type</label>
+                    <select name="answer_type" id="answer_type" class="selectpicker form-control">
+                        <option value="multiple">Multiple Choice</option>
+                    </select>
+                </div>
+                <div class="question-option">
+                    <label for="">Options</label>
+                    <div class="option-container">';
+                if(!empty($question['options'])) {
+                    foreach($question['options'] as $key => $option) {
+                        $key++;
+                        $form .= '
+                        <div class="form-group mb-1" data-option_id="'.$key.'">
+                            <div class="d-flex justify-content-between">
+                                <div class="col-11">
+                                    <input type="text" value="'.$option.'" name="option['.$key.']" id="option['.$key.']" class="form-control">
+                                </div>
+                                <div>
+                                    <button type="button" onclick="return remove_option(\''.$key.'\')" class="btn btn-outline-danger btn-sm">
+                                        <i class="fa fa-times-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>';
+                    }
+                }
+            $form .=  '
+                    </div>
+                    <span class="text-primary cursor" onclick="return add_option()">+ add option</span>
+                </div>
+                <div class="form-group mt-2">
+                    <label for="is_required" class="cursor">
+                        <input type="checkbox" name="is_required" id="is_required">
+                        Required question
+                    </label>
+                </div>
+                <div class="form-group mt-3">
+                    <button class="btn btn-success pr-5" type="submit">Save</button>
+                    <span class="text-primary cursor" onclick="return cancel_update()">Cancel</span>
+                </div>
+            </div>
+        </form';
+
+        return $this->api_response(['result' => $form, 'code' => 200]);
+        
     }
 
     /**

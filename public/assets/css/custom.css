@@ -276,7 +276,7 @@ time:hover {
 .card-footer {
     border-top: 1px solid #f0f1f4;
     align-items: stretch;
-    display: flex
+    /* display: flex */
 }
 
 .card-footer-item {
@@ -517,6 +517,18 @@ p.alert {
     width: 400px;
 }
 
+.font-20 {
+    font-size: 20px;
+}
+
+.font-18 {
+    font-size: 18px;
+}
+
+.font-16 {
+    font-size: 16px;
+}
+
 @media (max-width:800px) {
     .fluid-image img {
         max-width: 80%;
@@ -611,4 +623,33 @@ trix-editor.short-height {
     top: 0;
     right: 0;
     left: 0;
+}
+
+.edit-options {
+    display: none;
+}
+
+
+.question-wrapper:hover .questionnaire .hovercontrol .edit-options {
+    display: block;
+    position: absolute;
+    right: -30px;
+    border-radius: 5px;
+    top: 50px;
+    z-index: 1022;
+    width: 50px;
+    border: solid 1px #ccc;
+    background-color: #fff;
+    text-align: center;
+}
+
+.questionnaire .menu {
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 5px 5px 0px 0px;
+    border-bottom: 1px solid #ccc;
+}
+
+.questionnaire .menu:hover {
+    background: #f8f9fa;
 }

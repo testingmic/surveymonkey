@@ -20,7 +20,7 @@ include_once 'headtags.php';
         </div>
         <div class="row mt-3">
             <?php foreach($surveys_list as $survey) { ?>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-2">
                     <div class="card">
                         <div class="card-header">
                             <?= $survey['title'] ?>

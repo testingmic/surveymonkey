@@ -523,6 +523,92 @@ function get_metadata($metadata = [], $key_name = null) {
     return get_meta($metadata, $key_name);
 }
 
+/**
+ * Get the question answer
+ * 
+ * @param   Int     $questionId
+ * @param   Array   $theAnswers
+ * 
+ * @return String
+ */
+function selected_answer($questionId = null, $theAnswers = []) {
+    if(is_null($theAnswers) || empty($questionId) || !is_array($theAnswers)) {
+        return null;
+    }
+
+    foreach($theAnswers as $answer) {
+        if($answer['question'] == $questionId) {
+            return $answer['choice'];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Format the question to be displayed
+ * 
+ * @param Array     $question
+ * 
+ * @return Array 
+ */
+function format_question($question, $answer = null, $show_edit = false) {
+    
+    $questionOption = !empty($question['options']) ? json_decode($question['options'], true) : [];
+
+    $html = "
+    <div class='questionnaire position-relative mt-3' data-question_id='{$question['id']}'>
+        <div class='hovercontrol' data-item='hover'>
+            <div class='question' data-question_id='{$question['id']}'>
+                <div class='select-notice'></div>
+                <div class='label-question mt-1'>
+                    ".(!empty($question['is_required']) ? "<span class='required'>*</span>" : null)."
+                    <span class='question-title'>{$question['title']}</span>
+                </div>
+                <div class='choices position-relative'>";
+
+                $html .= $show_edit ? form_overlay() : null;
+
+                foreach($questionOption as $key => $option) { 
+                    
+                    $key++;
+                    $html .= "
+                    <div class='single-choice'>
+                        <label class='choice choice-{$key}' for='form_choice_id_{$question['id']}_{$key}'>
+                            <input ".(!is_null($answer) && ($answer == $key) ? "checked" : null)." class='styled' type='radio' value='{$key}' name='question[choice_id]' id='form_choice_id_{$question['id']}_{$key}' />
+                            <label for='form_choice_id_{$question['id']}_{$key}'>
+                                <p>{$option}</p>
+                            </label>
+                        </label>
+                    </div>";
+
+                }
+
+            $html .= "
+                <input type='hidden' hidden name='question[questionId]' value='{$question['id']}' readonly>
+                <input type='hidden' hidden name='is_required' value='{$question['is_required']}' readonly>
+                </div>
+            </div>";
+
+        if($show_edit) {
+            $html .= "
+            <div class='question_content'></div>
+            <div class='edit-options'>
+                <div class='menu' onclick='return trigger_edit(\"{$show_edit}\", {$question['id']})'>
+                    <i title='Edit' class='fa fa-edit text-primary'></i>
+                </div>
+                <div class='menu'>
+                    <i title='Delete' class='fa fa-trash text-danger'></i>
+                </div>
+            </div>";
+        }
+
+    $html .= "
+        </div>
+    </div>";
+    
+    return $html;
+}
 
 /**
  * Permission Handler
@@ -586,4 +672,3 @@ function minute_diff($time) {
     return $diff;
 
 }
-?>

@@ -39,8 +39,8 @@ class AppController extends ApiServices {
      * 
      * @return String
      */
-    public function not_found_text($section = null) {
-        return "This survey has been deleted or you are not authorized to access this page.";
+    public function not_found_text($section = "survey") {
+        return "This {$section} has been deleted or you are not authorized to access this page.";
     }
 
     /**

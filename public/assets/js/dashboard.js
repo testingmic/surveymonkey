@@ -1,6 +1,7 @@
 $(`span[class~="trix-button-group--file-tools"], span[class~="trix-button-group-spacer"], span[class~="trix-button-group--history-tools"]`).remove();
 
-var formoverlay = $(`div[class="formoverlay"]`);
+var formoverlay = $(`div[class="formoverlay"]`),
+    selectedQuestion;
 
 var _html_entities = (str) => {
     return String(str).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -62,6 +63,48 @@ var populate_statistics = function(results = "default", question_id) {
         $(`div[id="answer_question"]`).html(html_string);
     }
     
+}
+
+var cancel_update = () => {
+    $(`div[data-question_id="${selectedQuestion}"] div[class~='question']`).removeClass("hidden");
+    $(`div[data-question_id="${selectedQuestion}"] div[class="question_content"]`).html(``);
+    $(`div[class~="questionnaire"][data-question_id="${selectedQuestion}"] div[data-item='hover']`).addClass("hovercontrol");
+}
+
+var remove_option = (option_id) => {
+    $(`div[data-option_id="${option_id}"]`).remove();
+}
+
+var trigger_edit = function(slug, question_id) {
+    
+    $(`div[class="formoverlay"]`).hide();
+    $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).show();
+
+    $.get(`${baseURL}surveys/loadquestion/${slug}/${question_id}`).then((response) => {
+
+        $(`div[data-question_id="${selectedQuestion}"] div[class~='question']`).removeClass("hidden");
+        $(`div[data-question_id="${selectedQuestion}"] div[class="question_content"]`).html(``);
+        $(`div[class~="questionnaire"][data-question_id="${question_id}"] div[data-item='hover']`).removeClass("hovercontrol");
+
+        if(response.code == 200) {
+
+            if(selectedQuestion !== question_id) {
+                $(`div[class~="questionnaire"][data-question_id="${selectedQuestion}"] div[data-item='hover']`).addClass("hovercontrol");
+            }
+
+            selectedQuestion = question_id;
+            $(`div[data-question_id="${question_id}"] div[class~='question']`).addClass("hidden");
+            $(`div[data-question_id="${question_id}"] div[class="question_content"]`).html(response.data.result);
+        } else {
+            Notify(response.data.result);
+        }
+
+        $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).hide();
+
+    }).fail((err) => {
+        Notify("Sorry! An unexpected error occured while processing the request.");
+        $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).hide();
+    });
 }
 
 if($(`input[name="surveyAnalytic"]`).length) {

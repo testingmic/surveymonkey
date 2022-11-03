@@ -38,6 +38,7 @@ $routes->get('/embed/(:any)', 'Surveys::embed/$1/$2');
 $routes->post('/surveys/show_question', 'Surveys::question');
 $routes->get('/surveys/results(:any)', 'Surveys::results');
 $routes->get('/surveys/modify/(:any)', 'Surveys::modify/$1/$2/$3');
+$routes->get('/surveys/loadquestion/(:any)/(:num)', 'Surveys::loadquestion/$1/$2');
 
 // command line commands
 $routes->cli('root/(:any)', 'Crontab::jobs/$1');
