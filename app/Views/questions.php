@@ -23,6 +23,9 @@ $settings = [
                         <i class="fa fa-cog"></i> Configuration
                     </a>
                 <?php } ?>
+                <a class="btn btn-sm btn-primary" title="Dashboard" href="<?= $baseURL ?>">
+                    <i class="fa fa-home"></i>
+                </a>
             </div>
         </div>
         <div class="alert alert-success mb-0 mt-2">

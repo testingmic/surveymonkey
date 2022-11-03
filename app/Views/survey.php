@@ -23,6 +23,9 @@ $settings = [
                         <i class="fa fa-place-of-worship"></i> New Survey 
                     </a>
                 <?php } ?>
+                <a class="btn btn-sm btn-primary" title="Dashboard" href="<?= $baseURL ?>">
+                    <i class="fa fa-home"></i>
+                </a>
             </div>
         </div>
         <div class="row mb-4 pb-3">
@@ -37,8 +40,8 @@ $settings = [
                                     <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/questions" ?>">
                                         Survey Questions
                                     </a>
-                                    <a class="btn btn-sm btn-primary" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
-                                        <i class="fa fa-home"></i> Preview Survey
+                                    <a class="btn btn-sm btn-outline-warning" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
+                                        <i class="fa fa-home"></i> Preview
                                     </a>
                                     <?php } ?>
                                 </div>

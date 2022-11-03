@@ -49,6 +49,11 @@
 				"survey_id": "required|match_num",
 				"title": "required|match_alphanum|max_length=500"
 			}
+		},
+		"DELETE": {
+			"deletequestion": {
+				"question_id": "required|match_num"
+			}
 		}
 	}
 }

@@ -98,7 +98,7 @@ class AppController extends ApiServices {
 
                     $info['data']['additional'] = [
                         'clear' => true,
-                        'href' => "{$page}/modify/{$request['result']['slug']}/edit"
+                        'href' => "{$page}/modify/{$request['result']['slug']}/" . ($request['additional']['route'] ?? "edit")
                     ];
                     
                 } elseif( ($method == 'PUT') ) {

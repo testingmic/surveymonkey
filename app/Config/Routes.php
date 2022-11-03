@@ -39,6 +39,7 @@ $routes->get('/surveys/results(:any)', 'Surveys::results');
 $routes->post('/surveys/show_question', 'Surveys::question');
 $routes->post('/surveys/savequestion', 'Surveys::savequestion');
 $routes->get('/surveys/modify/(:any)', 'Surveys::modify/$1/$2/$3');
+$routes->post('/surveys/deletequestion/(:num)', 'Surveys::deletequestion/$1');
 $routes->get('/surveys/loadquestion/(:any)', 'Surveys::loadquestion/$1/$2');
 
 // command line commands

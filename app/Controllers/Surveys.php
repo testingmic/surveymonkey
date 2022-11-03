@@ -578,9 +578,25 @@ class Surveys extends AppController {
         if(isset($request['code']) && $request['code'] == 200) {
             $request['additional']['question'] = format_question($request['result'], null, $request['result']['slug'], false);
         }
+        $request['additional']['route'] = "questions";
 
-        return $this->api_response($request, $method, "question");
+        return $this->api_response($request, $method, "surveys");
 
+    }
+
+    /**
+     * Delete Question
+     * 
+     * @param Int       $question_id
+     * 
+     * @return Array
+     */
+    public function deletequestion($question_id) {
+
+        $request = $this->api_lookup("DELETE", "surveys/deletequestion", ['question_id' => $question_id]);
+
+        return $this->api_response($request, "DELETE", "question");
+        
     }
 
     /**
