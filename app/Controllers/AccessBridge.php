@@ -59,7 +59,7 @@ class AccessBridge {
         if( !empty($params['_userData']) && !in_array($route, ['notifications'])) {
             if ( empty($this->permission_handler('clients', 'monitoring', $params['_userData'])) ) {
                 if($route == 'clients') {
-                    if(!in_array($params['_userData']['id'], APPUSERID)) {
+                    if(!in_array($params['_userData']['id'], [1])) {
                         $data['a.id'] = [$params['_userData']['client_id']];
                     }
                 } else {
@@ -83,7 +83,91 @@ class AccessBridge {
      */
     public function dataValidationGrouping($db_model = [], $params = [], $accepted = [], $additional = []) {
 
+        $param = [];
+
+        // set the model name
+        $this->_model_name = $params['_model_name'] ?? null;
         
+        // group the values
+        foreach($params as $key => $value) {
+            if(in_array($key, array_keys($accepted))) {
+                $column_value = $this->value_is_string ? (string) $value : clean_tags($value);
+                $param[$key] = is_array($column_value) ? json_encode($column_value) : $column_value;
+            }
+        }
+
+        if( in_array('client_id', $additional) && empty($param['client_id']) ) {
+            $param['client_id'] = (int) $params['_userData']['client_id'];
+        }
+
+        // set additional data
+        if( !empty($additional) && ($params['req_method'] === 'POST')) {
+            if( in_array('created_by', $additional) ) {
+                $param['created_by'] = $params['_userData']['id'];
+            }
+        }
+
+        // if the user has no permission to view all other clients
+        if(!empty($param['client_id'])) {
+            if ( empty($this->permission_handler('clients', 'list', $params['_userData'])) && 
+                ((int) $param['client_id'] !== (int) $params['_userData']['client_id'])
+            ) {
+                return "Sorry! An invalid school id was parsed in the request.";
+            }
+        }
+
+        // confirm the school
+        if(!empty($params['in_array_check'])) {
+            foreach($params['in_array_check'] as $key => $value) {
+                if(in_array($key, array_keys($param))) {
+                    if(!in_array($param[$key], $value)) {
+                        return "The accepted values for {$key} are: ".implode(", ", $value);
+                    }
+                }
+            }
+        }
+
+        try {
+
+            // confirm if the record actually exists
+            if( !empty($params['required_validation']) ) {
+                if ( !empty($db_model) ) {
+
+                    foreach($params['required_validation'] as $table => $where_clause) {
+                        $result = $db_model->db->table($table)->where($where_clause)->limit(1)->get();
+                        $data = !empty($result) ? $result->getResultArray() : [];
+                        if(empty($data)) {
+                            return $this->record_not_found;
+                        }
+                        
+                        if( $this->_model_name === $table ) {
+                            $param['previous_record'] = $data[0];
+                        }
+                    }
+
+                }
+            }
+
+            // validate some values
+            if( !empty($params['column_validation']) ) {
+                if ( !empty($db_model) ) {
+                    foreach($params['column_validation'] as $column => $table) {
+                        if(in_array($column, array_keys($param)) && !empty($param[$column])) {
+                            $result = $db_model->db->table($table[1])->where([$table[0] => $param[$column]])->limit(1)->get();
+                            $data = !empty($result) ? $result->getResultArray() : [];
+                            if(empty($data)) {
+                                return "Sorry! {$column} detail could not be found";
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $param;
+
+        } catch(\Exception $e) {
+            return [];
+        }
 
     }
 

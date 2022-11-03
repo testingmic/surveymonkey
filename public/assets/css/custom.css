@@ -326,8 +326,13 @@ time:hover {
 .card img,
 .card svg {
     display: block;
-    max-width: 150px;
     margin: 15px auto 20px
+}
+
+.survey-image {
+    min-height: 200px;
+    max-height: 200px;
+    overflow-y: hidden;
 }
 
 h3 {
@@ -587,4 +592,23 @@ trix-editor {
 trix-editor.short-height {
     min-height: 100px!important;
     max-height: 200px!important;
+}
+
+.formoverlay .offline-content {
+    width: 100%;
+    font-size: 17px;
+    font-weight: bolder;
+}
+
+.formoverlay {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85);
+    position: absolute;
+    z-index: 1020;
+    top: 0;
+    right: 0;
+    left: 0;
 }

@@ -48,9 +48,7 @@ var guid = function() {
     guid += screen.width || '';
     guid += screen.pixelDepth || '';
 
-    let user_guid = guid.substring(0, 10) + "" + guid.substring(guid.length - 10);
-
-    return user_guid;
+    return guid;
 };
 
 $(`button[id="poll-button"]`).on("click", async function() {
@@ -153,7 +151,7 @@ var multi_voting_check = function() {
     if($(`input[name="multipleVoting"]`).length) {
         let value = $(`input[name="multipleVoting"]`).val();
         if(value == "No") {
-            let user_guid = guid() + "_" + $(`input[name="ipAddress"]`).val();
+            let user_guid = guid();
             if($.inArray(user_guid, votersGUID) !== -1) {
                 $(`button[id="poll-button"], div[id="skipquestion"]`).remove();
                 $(`div[class~="percentage"]`).html(`<button class="btn btn-success begin-button">One vote allowed!</button>`);
@@ -163,71 +161,7 @@ var multi_voting_check = function() {
 }
 multi_voting_check();
 
-var populate_statistics = function(results = "default", question_id) {
-
-    let theSurvey = results == "default" ? surveyResults : results;
-    let questions = theSurvey.questions;
-
-    if(questions !== undefined) {
-        let html_string = "";
-        let e = questions[question_id];
-
-        if(e == undefined) {
-            Notify("Sorry! The question id does not exist");
-            return false;
-        }
-        
-        let options = e.grouping;
-        html_string += `<div class='mb-5'>`;
-        html_string += `<div class='pb-1'><strong>${e.title}</strong></div>`;
-        $.each(options, function(ii, ee) {
-            let label = ee.count == 1 || ee.count == 0 ? "vote" : "votes";
-            html_string += `
-            <div class="d-flex justify-content-between border-bottom mb-2 pb-2">
-                <div>
-                    ${ii}
-                </div>
-                <div>
-                    <div class="progress-bar-container mt-0 text-left">
-                        <div class="progress-bar mt-1" title="${ee.count} votes">
-                            <div class="progress-bar-completed" style="width: ${ee.percentage}%;"></div>
-                        </div>
-                        <div class="d-flex justify-content-end" style="width:110px;font-size:14px">
-                            <div style="margin-right:10px">
-                                ${ee.count} ${label}
-                            </div>
-                            <div class="badge bg-secondary" style="width:40px;">
-                                ${ee.percentage}%
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        });
-        html_string += "</div>";
-        $(`div[id="answer_question"]`).html(html_string);
-    }
-    
-}
-
 $(`select[name="question_id"][id="question_id"]`).on("change", function() {
     let value = $(this).val();
     populate_statistics("default", value);
 });
-
-if($(`input[name="surveyAnalytic"]`).length) {
-    let data = $(`input[name="surveyAnalytic"]`).data();
-    $.get(`${baseURL}surveys/results`, data).then((response) => {
-        if(response.code == 200) {
-            surveyResults = response.data.result;
-            let questions = response.data.result.questions;
-    
-            if(questions !== undefined) {
-                $.each(questions, function(i, e) {
-                    $(`select[name="question_id"]`).append(`<option value="${i}">${e.title}</option>`);
-                });
-                populate_statistics(surveyResults, surveyResults.first_question);
-            }
-        }
-    });
-}

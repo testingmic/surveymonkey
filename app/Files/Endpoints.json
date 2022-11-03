@@ -5,6 +5,32 @@
 				"slug":"match_alphanum|min_length=5|max_length=32",
 				"id":"match_num|max_length=500"
 			}
+		},
+		"POST": {
+			"create": {
+				"settings":"is_an_array|match_alphanum=5000",
+				"title": "required|match_alphanum|max_length=255",
+				"slug": "match_alphanum|max_length=300",
+				"start_date": "is_date",
+				"end_date": "is_date",
+				"is_published": "matches=0,1",
+				"cover_art": "is_file",
+				"button_text": "required|match_alphanum|max_length=32",
+				"description": "required|match_alphanum|max_length=5000"
+			}
+		},
+		"PUT": {
+			"update": {
+				"settings":"is_an_array|match_alphanum=5000",
+				"title": "required|match_alphanum|max_length=255",
+				"slug": "match_alphanum|max_length=300",
+				"start_date": "is_date",
+				"end_date": "is_date",
+				"is_published": "matches=0,1",
+				"cover_art": "is_file",
+				"button_text": "required|match_alphanum|max_length=32",
+				"description": "required|match_alphanum|max_length=5000"
+			}
 		}
 	}
 }

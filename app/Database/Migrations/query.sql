@@ -1,2 +1,3 @@
-ALTER TABLE `documents` ADD `reference_id` TINYINT(5) NULL DEFAULT NULL AFTER `model_id`;
-ALTER TABLE `documents` CHANGE `is_downloadable` `is_downloadable` ENUM('0','1','2') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0', CHANGE `upload_is_required` `upload_is_required` ENUM('0','1','2') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0';
+ALTER TABLE `surveys`  ADD `created_by` VARCHAR(32) NULL DEFAULT NULL  AFTER `users_logs`;
+ALTER TABLE `surveys_questions`  ADD `created_by` VARCHAR(32) NULL DEFAULT NULL  AFTER `status`;
+ALTER TABLE `surveys` CHANGE `cover_art` `cover_art` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'assets/images/survey.jpg';

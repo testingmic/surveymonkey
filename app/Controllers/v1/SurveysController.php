@@ -245,4 +245,134 @@ class SurveysController extends AccessBridge {
 
     }
 
+    /**
+     * Create the record using the id as unique key
+     * 
+     * @param Array     $params
+     * @param Int       $record_id
+     * 
+     * @return Bool
+     */
+    public function create(array $params = []) {
+
+        try {
+
+            // permission check
+            $check = $this->permission_handler($this->route, 'update', $params['_userData']);
+            if( empty($check) ) {
+                return $this->permission_denied;
+            }
+
+            $params['in_array_check'] = ['status' => [1, 2]];
+
+            // columns to validate
+            $params['column_validation'] = ['client_id' => ['id', 'clients']];
+
+            if( !empty($params['title']) ) {
+                
+                $params['slug'] = url_title($params['title'], '-', true);
+
+            }
+
+            // validate the record set
+            $params = $this->dataValidationGrouping($this->db_model, $params, $this->parameters, ['client_id', 'created_by']);
+
+            if (!is_array($params)) {
+                return ['code' => 203, 'result' => $params];
+            }
+
+            if( !empty($params['slug']) ) {
+                
+                $params['slug'] = url_title($params['title'], '-', true);
+
+                $result = $this->db_model->db->table($this->item_table)
+                                            ->where(['slug' => $params['slug'], 'status' => '1'])
+                                            ->limit(1)->get();
+
+                $check = !empty($result) ? $result->getResultArray() : [];
+
+                if (!empty($check)) {
+                    return ['code' => 404, 'result' => 'Sorry! There is an existing survey with the same title.'];
+                }
+
+            }
+
+            $record_id = $this->db_model->create($params);
+
+            if($record_id) {
+                // get the current data
+                $params['current_record'] = $this->list(['bypass' => true], $record_id)[0];
+
+                // return the result
+                return ['code' => 200, 'result' => $params['current_record']];
+            }
+
+        } catch(\Exception $e) {
+            return [];            
+        }
+        
+    }
+
+    /**
+     * Update the record using the id as unique key
+     * 
+     * @param Array     $params
+     * @param Int       $record_id
+     * 
+     * @return Bool
+     */
+    public function update(array $params = [], $record_id = null) {
+
+        try {
+
+            // permission check
+            $check = $this->permission_handler($this->route, 'update', $params['_userData']);
+            if( empty($check) ) {
+                return $this->permission_denied;
+            }
+
+            $params['in_array_check'] = ['status' => [1, 2]];
+
+            // columns to validate
+            $params['column_validation'] = ['client_id' => ['id', 'clients']];
+
+            // perform a required validation
+            $params['required_validation'] = [$this->item_table => ['id' => $record_id, 'status !=' => '0']];
+
+            // validate the record set
+            $params = $this->dataValidationGrouping($this->db_model, $params, $this->parameters, ['client_id', 'created_by']);
+
+            if (!is_array($params)) {
+                return ['code' => 203, 'result' => $params];
+            }
+
+            if( !empty($params['slug']) ) {
+                if($params['previous_record']['slug'] !== $params['slug']) {
+                    $result = $this->db_model->db->table($this->item_table)
+                                            ->where(['slug' => $params['slug'], 'status' => '1'])
+                                            ->limit(1)->get();
+
+                    $check = !empty($result) ? $result->getResultArray() : [];
+
+                    if (!empty($check)) {
+                        return ['code' => 404, 'result' => 'Sorry! There is an existing survey with the same title.'];
+                    }
+                }
+            }
+
+            $request = $this->db_model->change($record_id, $params);
+            if($request) {
+                // get the current data
+                $params['current_record'] = $this->list(['bypass' => true], $record_id)[0];
+
+                // return the result
+                return ['code' => 200, 'result' => $params['current_record']];
+            }
+
+        } catch(\Exception $e) {
+            return [];            
+        }
+        
+    }
+
 }

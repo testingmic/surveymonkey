@@ -16,7 +16,9 @@ class Surveys extends AppController {
 
         $data = [];
         $data['isFound'] = false;
+        $data['manageSurvey'] = true;
         $data['slug'] = null;
+
         if( $slug == 'add') {
             $data['pagetitle'] = "New Survey";
         }
@@ -107,6 +109,8 @@ class Surveys extends AppController {
             $data['votersGUID'] = !empty($users) ? array_column($users, 'guid') : [];
             $data['ip_address'] = $this->request->getIPAddress();
 
+        } else {
+            $data['manageSurvey'] = true;
         }
 
         // display the page
@@ -435,7 +439,7 @@ class Surveys extends AppController {
             $vote = $votesObject->castvotes([
                 'survey_id' => $this->sessObject->surveyId, 
                 'votes' => $theAnswers,
-                'guid' => $params['guid'] .'_'. $ip_address,
+                'guid' => $params['guid'],
             ]);
 
             // if not successful
@@ -475,10 +479,68 @@ class Surveys extends AppController {
      */
     public function save() {
         
+        $method = "POST";
+        $endpoint = "surveys";
         $params = array_map('esc', $this->request->getPost());
 
-        return $this->error('Pending processing');
+        foreach(['title', 'description', 'button_text'] as $item) {
+            if(empty($params[$item])) {
+                return $this->error("Sorry the {$item} is required.");
+            }
+            $param[$item] = clean_text($params[$item]);
+        }
+
+        if(!empty($params['settings'])) {
+            if(!is_array($params['settings'])) {
+                return $this->error("Sorry! The settings must be an array");
+            }
+            $accepted = [
+                'display_images', 'publicize_result', 'receive_statistics',
+                'allow_multiple_voting', 'paginate_question', 'allow_skip_question', 
+                'thank_you_text', 'closed_survey_text', 'footer_text'
+            ];
+
+            foreach($params['settings'] as $key => $value) {
+                if(!in_array($key, $accepted)) {
+                    return $this->error("Sorry the {$key} variable is not accepted.");
+                }
+                $param['settings'][$key] = clean_text($value);
+            }
+
+            $param['settings'] = json_encode($param['settings']);
+        }
+
+        if(isset($params['start_date'])) {
+            if(valid_date($params['start_date'])) {
+                $param['start_date'] = date("Y-m-d H:i:s", strtotime($params['start_date']));
+            } else {
+                $param['start_date'] = null;
+            }
+        }
+
+        if(isset($params['end_date'])) {
+            if(valid_date($params['end_date'])) {
+                $param['end_date'] = date("Y-m-d H:i:s", strtotime($params['end_date']));
+            } else {
+                $param['end_date'] = null;
+            }
+        }
+
+        foreach(['slug', 'is_published', 'cover_art'] as $item) {
+            if(isset($params[$item])) {
+                $param[$item] = clean_text($params[$item]);
+            }
+        }
+
+        if(!empty($params['survey_id'])) {
+            $method = "PUT";
+            $endpoint = "surveys/{$params['survey_id']}";
+        }
+
+        $request = $this->api_lookup($method, $endpoint, $param);
         
+        return $this->api_response($request, $method, 'surveys');
+
     }
 
 }

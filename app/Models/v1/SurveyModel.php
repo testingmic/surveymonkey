@@ -8,7 +8,10 @@ class SurveyModel extends Model {
     
     protected $table = 'surveys';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['title', 'slug', 'date_created', 'created_by'];
+    protected $allowedFields = [
+        'client_id', 'title', 'slug', 'description', 'end_date', 'is_published', 'button_text',
+        'date_created', 'created_by', 'settings', 'start_date', 'status', 'cover_art'
+    ];
 
     public function create($data) {
         
@@ -18,21 +21,21 @@ class SurveyModel extends Model {
 
     }
 
-    public function change($class_id, $data) {
+    public function change($survey_id, $data) {
 
-        return $this->update($class_id, $data);
-
-    }
-
-    public function status($class_id, $status) {
-        
-        return $this->update($class_id, $status);
+        return $this->update($survey_id, $data);
 
     }
 
-    public function remove($class_id) {
+    public function status($survey_id, $status) {
         
-        return $this->update($class_id, ['status' => '0']);
+        return $this->update($survey_id, $status);
+
+    }
+
+    public function remove($survey_id) {
+        
+        return $this->update($survey_id, ['status' => '0']);
 
     }
 

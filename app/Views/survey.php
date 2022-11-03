@@ -1,7 +1,7 @@
 <?php
 include_once 'headtags.php';
 $settings = [
-    'display_images', 'publicize_result', 'receive_statistics',
+    'publicize_result', 'receive_statistics',
     'allow_multiple_voting', 'paginate_question', 'allow_skip_question'
 ];
 ?>
@@ -37,28 +37,25 @@ $settings = [
                                     <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/edit" ?>/questions">
                                         Questions
                                     </a>
+                                    <a class="btn btn-sm btn-primary" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
+                                        <i class="fa fa-home"></i> Preview Survey
+                                    </a>
                                     <?php } ?>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body bg-white">
+                        <div class="card-body bg-white position-relative">
+                            <?= form_overlay(); ?>
                             <div class="row">
                                 <div class="col-md-12 border-bottom mb-3 border-primary">
                                     <h5 class="text-primary text-uppercase">Basic Information</h5>
                                 </div>
-                                <div class="col-md-9 mb-3">
-                                    <label for="">Survey Title</label>
+                                <div class="col-md-12 mb-3">
+                                    <label for="">Survey Title <span class="required">*</span></label>
                                     <input type="text" name="title" class="form-control" value="<?= $survey['title'] ?? null ?>">
                                 </div>
-                                <div class="col-md-3 mb-3">
-                                    <label for="">Is Published</label>
-                                    <select class="form-control" name="is_published" id="is_published">
-                                        <option <?= !empty($survey) && empty($survey['is_published']) ? "selected" : null; ?> value="0">No</option>
-                                        <option <?= !empty($survey) && !empty($survey['is_published']) ? "selected" : null; ?> value="1">Yes</option>
-                                    </select>
-                                </div>
                                 <div class="col-lg-12 mb-3">
-                                    <label for="">Description</label>
+                                    <label for="">Description <span class="required">*</span></label>
                                     <trix-editor input='trix_input' class='trix-slim-scroll' id='description' name='description'></trix-editor>
                                     <input type='hidden' hidden id='trix_input' value='<?= isset($survey['description']) ? htmlentities($survey['description']) : null ?>'>
                                 </div>
@@ -80,8 +77,19 @@ $settings = [
                                 <div class="col-md-12 border-bottom mt-3 mb-3 border-primary">
                                     <h5 class="text-primary text-uppercase">Settings</h5>
                                 </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="">Start Button Text <span class="required">*</span></label>
+                                    <input type="text" maxlength="32" class="form-control" name="button_text" value="<?= $survey['button_text'] ?? null ?>">
+                                </div>
+                                <div class="col-md-3 col-sm-6 mb-3">
+                                    <label for="">Is Published</label>
+                                    <select class="form-control" name="is_published" id="is_published">
+                                        <option <?= !empty($survey) && empty($survey['is_published']) ? "selected" : null; ?> value="0">No</option>
+                                        <option <?= !empty($survey) && !empty($survey['is_published']) ? "selected" : null; ?> value="1">Yes</option>
+                                    </select>
+                                </div>
                                 <?php foreach($settings as $item) { ?>
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-3 col-sm-6 mb-3">
                                         <label for=""><?= ucwords(str_ireplace("_", " ", $item)); ?></label>
                                         <select name="settings[<?= $item ?>]" id="settings[<?= $item ?>]" class="form-control">
                                             <option <?= !empty($survey) && empty($survey['settings'][$item]) ? "selected" : null; ?> value="0">No</option>

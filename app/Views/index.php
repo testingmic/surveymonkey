@@ -24,7 +24,9 @@ include_once 'headtags.php';
                             <?= $survey['title'] ?>
                         </div>
                         <div class="card-body bg-white">
-                            <img width="100%" src="<?= $baseURL . $survey['cover_art'] ?>" alt="">
+                            <div class="survey-image">
+                                <img class="m-0" width="100%" src="<?= $baseURL . $survey['cover_art'] ?>" alt="">
+                            </div>
                             <div>
                                 <?= character_limiter(strip_tags($survey['description']), 160) ?>
                             </div>

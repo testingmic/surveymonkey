@@ -85,7 +85,7 @@ class AppController extends ApiServices {
         }
 
         if( in_array($info['code'], [200, 201]) ) {
-            $item_name = $request['result']['name'] ?? ($request['result']['username'] ?? ucwords($page));
+            $item_name = $request['result']['title'] ?? ($request['result']['username'] ?? ucwords($page));
 
             if( isset($request['result']['id']) ) {
 
@@ -94,17 +94,12 @@ class AppController extends ApiServices {
 
                     $info['data']['additional'] = [
                         'clear' => true,
-                        'href' => "account/{$page}/{$request['result']['id']}/view"
+                        'href' => "{$page}/modify/{$request['result']['slug']}/edit"
                     ];
                     
                 } elseif( ($method == 'PUT') ) {
                     
                     $info['data']['result'] = "{$item_name} record successfully updated.";
-
-                    if( in_array($page, ['students']) ) {
-                        // if the request is to update
-                        $info['data']['additional']['href'] = "account/{$page}/{$request['result']['id']}/view";
-                    }
 
                     if(isset($request['additional'])) {
                         $info['data']['additional'] = $request['additional'];
@@ -130,7 +125,7 @@ class AppController extends ApiServices {
 
         }
 
-        elseif( !is_array($request) ) {
+        elseif( !is_array($request) || !isset($request['code']) ) {
             $info['data']['result'] = $request;
         }
 
