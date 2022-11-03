@@ -321,7 +321,14 @@ class Surveys extends AppController {
                 $this->sessObject->set('nextQuestion', 'final');
             } else {
                 $question_key = array_column_key($theSurvey['questions'], $params['question_id'], 'id');
-                $this->sessObject->set('nextQuestion', ($question_key + 1));
+                
+                foreach($theSurvey['questions'] as $id => $data) {
+                    if($id > $question_key) {
+                        $this->sessObject->set('nextQuestion', $id);
+                        break;
+                    }
+                }
+                
             }
 
         }

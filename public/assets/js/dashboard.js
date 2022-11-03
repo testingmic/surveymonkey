@@ -233,6 +233,15 @@ if($(`input[name="surveyAnalytic"]`).length) {
     });
 }
 
+setInterval(() => {
+    let data = $(`input[name="surveyAnalytic"]`).data();
+    $.get(`${baseURL}surveys/results`, data).then((response) => {
+        if(response.code == 200) {
+            surveyResults = response.data.result;
+        }
+    });
+}, 10000);
+
 $(`form[class="appForm"]`).on("submit", function(evt) {
     evt.preventDefault();
     
