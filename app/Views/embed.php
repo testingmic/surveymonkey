@@ -34,7 +34,8 @@ include_once 'headtags.php';
             </div>
         <?php } else { ?>
             <input type="hidden" name="surveyAnalytic" data-survey_slug="<?= $survey['slug'] ?>" data-survey_id="<?= $survey['id'] ?>" disabled>
-            <div class="container p-3 survey_analytic">
+            <div class="container p-3 position-relative survey_analytic">
+                <?= form_overlay() ?>
                 <div class="row">
                     <div class="col-md-9"><h5>Survey Report</h5></div>
                     <div class="col-md-3">

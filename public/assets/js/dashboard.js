@@ -218,11 +218,12 @@ var add_question = function(slug) {
 
 if($(`input[name="surveyAnalytic"]`).length) {
     let data = $(`input[name="surveyAnalytic"]`).data();
+    formoverlay.show();
     $.get(`${baseURL}surveys/results`, data).then((response) => {
+        formoverlay.hide();
         if(response.code == 200) {
             surveyResults = response.data.result;
             let questions = response.data.result.questions;
-    
             if(questions !== undefined) {
                 $.each(questions, function(i, e) {
                     $(`select[name="question_id"]`).append(`<option value="${i}">${e.title}</option>`);
@@ -230,17 +231,23 @@ if($(`input[name="surveyAnalytic"]`).length) {
                 populate_statistics(surveyResults, surveyResults.first_question);
             }
         }
+    }).fail((err) => {
+        formoverlay.hide();
     });
 }
 
 setInterval(() => {
+    formoverlay.show();
     let data = $(`input[name="surveyAnalytic"]`).data();
     $.get(`${baseURL}surveys/results`, data).then((response) => {
+        formoverlay.hide();
         if(response.code == 200) {
             surveyResults = response.data.result;
         }
+    }).fail((err) => {
+        formoverlay.hide();
     });
-}, 10000);
+}, 100000);
 
 $(`form[class="appForm"]`).on("submit", function(evt) {
     evt.preventDefault();
