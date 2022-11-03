@@ -4,6 +4,7 @@ $settings = [
     'publicize_result', 'receive_statistics',
     'allow_multiple_voting', 'paginate_question', 'allow_skip_question'
 ];
+$atLeastOne = (bool) (hasPermission("surveys", "add", $metadata) || hasPermission("surveys", "update", $metadata));
 ?>
 <div class="survey-container">
     <div class="survey-header">
@@ -18,7 +19,7 @@ $settings = [
                 <a class="btn btn-outline-primary btn-sm" href="<?= $baseURL ?>">
                     <i class="fa fa-list"></i> List Surveys
                 </a>
-                <?php if( !empty($isFound) ) { ?>
+                <?php if( !empty($isFound) && hasPermission("surveys", "add", $metadata)) { ?>
                     <a class="btn btn-sm btn-outline-success" href="<?= $baseURL ?>surveys/modify/add">
                         <i class="fa fa-place-of-worship"></i> New Survey 
                     </a>
@@ -30,19 +31,21 @@ $settings = [
         </div>
         <div class="row mb-4 pb-3">
             <div class="col-lg-12 mt-2">
-                <form action="<?= $baseURL ?>surveys/save" class="appForm" method="POST">
+                <?= $atLeastOne ? '<form action="'.$baseURL.'surveys/save" class="appForm" method="POST">' : null ?>
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between w-100">
                                 <div><span class="surveytitle">Survey Configuration</span></div>
                                 <div>
                                     <?php if(!empty($slug)) { ?>
-                                    <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/questions" ?>">
-                                        Survey Questions
-                                    </a>
-                                    <a class="btn btn-sm btn-outline-warning" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
-                                        <i class="fa fa-home"></i> Preview
-                                    </a>
+                                        <?php if(hasPermission("questions", "add", $metadata) || hasPermission("questions", "update", $metadata)) { ?>
+                                            <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/questions" ?>">
+                                                Survey Questions
+                                            </a>
+                                        <?php } ?>
+                                        <a class="btn btn-sm btn-outline-warning" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
+                                            <i class="fa fa-home"></i> Preview
+                                        </a>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -111,15 +114,19 @@ $settings = [
                                     <label for="">End Time</label>
                                     <input type="datetime-local" value="<?= $survey['end_date'] ?? null ?>" name="end_date" id="end_date" class="form-control">
                                 </div>
+                                <?php if(hasPermission("surveys", "update", $metadata)) { ?>
                                 <input type="hidden" readonly name="slug" value="<?= $slug ?>">
                                 <input type="hidden" readonly name="survey_id" value="<?= $survey['id'] ?? null ?>">
+                                <?php } ?>
+                                <?php if($atLeastOne) { ?>
                                 <div class="col-md-12 text-center mt-4">
                                     <button class="btn min-150 btn-success" type="submit"><i class="fa fa-save"></i> Save</button>
                                 </div>
+                                <?php } ?>
                             </div>
                         </div>
                     </div>
-                </form>
+                <?= $atLeastOne ? '</form>' : null; ?>
             </div>
         </div>
     </div>

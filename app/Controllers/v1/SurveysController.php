@@ -494,6 +494,12 @@ class SurveysController extends AccessBridge {
     public function deletequestion($params) {
 
         try {
+            
+            // permission check
+            $check = $this->permission_handler('questions', 'delete', $params['_userData']);
+            if( empty($check) ) {
+                return $this->permission_denied;
+            }
 
             $result = $this->db_model->db->table('surveys_questions')
                                     ->where(['id' => $params['question_id'], 'client_id' => $params['_userData']['client_id']])

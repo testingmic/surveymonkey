@@ -552,10 +552,11 @@ function selected_answer($questionId = null, $theAnswers = []) {
  * @param String    $answer
  * @param Bool      $show_edit
  * @param Bool      $show_border
+ * @param Array     $permissions
  * 
  * @return Array 
  */
-function format_question($question, $answer = null, $show_edit = false, $show_border = true) {
+function format_question($question, $answer = null, $show_edit = false, $show_border = true, $permission = []) {
     
     $questionOption = !empty($question['options']) ? json_decode($question['options'], true) : [];
 
@@ -595,16 +596,29 @@ function format_question($question, $answer = null, $show_edit = false, $show_bo
             </div>";
 
         if($show_edit) {
-            $html .= "
-            <div class='question_content'></div>
-            <div class='edit-options'>
+            $html .= "<div class='question_content'></div>";
+
+            if(!empty($permission['canEdit']) || !empty($permission['canDelete'])) {
+                $html .= "<div class='edit-options'>";
+            }
+
+            if(!empty($permission['canEdit'])) {
+                $html .= "
                 <div class='menu' onclick='return trigger_edit(\"{$show_edit}\", {$question['id']})'>
                     <i title='Edit' class='fa fa-edit text-primary'></i>
-                </div>
+                </div>";
+            }
+            if(!empty($permission['canDelete'])) {
+                $html .= "
                 <div class='menu' onclick='return delete_question({$question['id']})'>
                     <i title='Delete' class='fa fa-trash text-danger'></i>
-                </div>
-            </div>";
+                </div>";
+            }
+
+            if(!empty($permission['canEdit']) || !empty($permission['canDelete'])) {
+                $html .= "</div>";
+            }
+
         }
 
     $html .= "</div>";
