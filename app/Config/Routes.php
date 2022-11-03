@@ -35,10 +35,11 @@ $routes->get('/', 'Home::index');
 $routes->get('/embed', 'Surveys::embed');
 $routes->post('/surveys/save', 'Surveys::save');
 $routes->get('/embed/(:any)', 'Surveys::embed/$1/$2');
-$routes->post('/surveys/show_question', 'Surveys::question');
 $routes->get('/surveys/results(:any)', 'Surveys::results');
+$routes->post('/surveys/show_question', 'Surveys::question');
+$routes->post('/surveys/savequestion', 'Surveys::savequestion');
 $routes->get('/surveys/modify/(:any)', 'Surveys::modify/$1/$2/$3');
-$routes->get('/surveys/loadquestion/(:any)/(:num)', 'Surveys::loadquestion/$1/$2');
+$routes->get('/surveys/loadquestion/(:any)', 'Surveys::loadquestion/$1/$2');
 
 // command line commands
 $routes->cli('root/(:any)', 'Crontab::jobs/$1');

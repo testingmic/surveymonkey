@@ -592,6 +592,10 @@ p.alert {
     }
 }
 
+.min-100 {
+    min-width: 70px;
+}
+
 .min-150 {
     min-width: 100px;
 }

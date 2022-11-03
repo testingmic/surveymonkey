@@ -44,11 +44,12 @@ $settings = [
                                 <?php } ?>
                             <?php } ?>
                         <?php } ?>
-                        <pre>
-                        </pre>
+                        <div class="p-3">
+                            <div class="new-question"></div>
+                        </div>
                     </div>
                     <div class="card-footer text-center w-100">
-                        <button class="btn btn-secondary">
+                        <button onclick="return add_question('<?= $slug; ?>')" class="btn btn-secondary">
                             <i class="fa fa-plus"></i> Add Question
                         </button>
                     </div>

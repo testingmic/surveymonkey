@@ -597,7 +597,7 @@ function format_question($question, $answer = null, $show_edit = false) {
                 <div class='menu' onclick='return trigger_edit(\"{$show_edit}\", {$question['id']})'>
                     <i title='Edit' class='fa fa-edit text-primary'></i>
                 </div>
-                <div class='menu'>
+                <div class='menu' onclick='return delete_question({$question['id']})'>
                     <i title='Delete' class='fa fa-trash text-danger'></i>
                 </div>
             </div>";

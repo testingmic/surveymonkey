@@ -17,6 +17,14 @@
 				"cover_art": "is_file",
 				"button_text": "required|match_alphanum|max_length=32",
 				"description": "required|match_alphanum|max_length=5000"
+			},
+			"createquestion": {
+				"answer_type": "required|matches=multiple,text,checkbox",
+				"instructions": "match_alphanum|max_length=1000",
+				"options": "max_length=2000",
+				"question_id": "match_num",
+				"survey_id": "required|match_num",
+				"title": "required|match_alphanum|max_length=500"
 			}
 		},
 		"PUT": {
@@ -30,6 +38,14 @@
 				"cover_art": "is_file",
 				"button_text": "required|match_alphanum|max_length=32",
 				"description": "required|match_alphanum|max_length=5000"
+			},
+			"updatequestion": {
+				"answer_type": "required|matches=multiple,text,checkbox",
+				"instructions": "match_alphanum|max_length=1000",
+				"options": "max_length=2000",
+				"question_id": "match_num",
+				"survey_id": "required|match_num",
+				"title": "required|match_alphanum|max_length=500"
 			}
 		}
 	}

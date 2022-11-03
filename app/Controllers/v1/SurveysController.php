@@ -375,4 +375,42 @@ class SurveysController extends AccessBridge {
         
     }
 
+    /**
+     * Create a question
+     * 
+     * @return Array
+     * 
+     * 
+     */
+    public function createquestion(array $params = []) {
+
+        try {
+
+
+
+        } catch(\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
+    /**
+     * Update a question
+     * 
+     * @return Array
+     * 
+     * 
+     */
+    public function updatequestion(array $params = []) {
+        
+        try {
+
+            
+
+        } catch(\Exception $e) {
+            return $e->getMessage();
+        }
+
+    }
+
 }

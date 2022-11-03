@@ -13,6 +13,27 @@ var release_form = () => {
     $(`button[type="submit"]`).html(`<i class="fa fa-save"></i> Save`);
 }
 
+var add_option = (question_id = 'new_question') => {
+    let data = $(`div[class="option-container"][id="question_id_${question_id}"] div[data-option_id]:last`).data();
+    let next_row = data.option_id !== undefined ? (data.option_id + 1) : 1;
+
+    let option_row = `
+    <div class="form-group mb-2" data-question="${question_id}" data-option_id="${next_row}">
+        <div class="d-flex justify-content-between">
+            <div class="col-11">
+                <input type="text" name="option[${next_row}]" id="option[${next_row}]" class="form-control">
+            </div>
+            <div>
+                <button type="button" onclick="return remove_option('${next_row}')" class="btn btn-outline-danger btn-sm">
+                    <i class="fa fa-times-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>`;
+    $(`div[class="option-container"][id="question_id_${question_id}"]`).append(option_row);
+
+}
+
 var populate_statistics = function(results = "default", question_id) {
 
     let theSurvey = results == "default" ? surveyResults : results;
@@ -65,19 +86,88 @@ var populate_statistics = function(results = "default", question_id) {
     
 }
 
+var delete_question = (question_id) => {
+    swal({
+        title: "Delete Question",
+        text: "Are you sure you want to delete this question? You cannot reverse the action once confirmed.",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    }).then((proceed) => {
+        if (proceed) {
+            $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).show();
+            $.post(`${baseURL}surveys/deletequestion/${question_id}`).then((response) => {
+                Notify(response.data.result, responseCode(response.code));
+                if(response.code == 200) {
+                    $(`div[class~="questionnaire"][data-question_id="${question_id}"]`).remove();
+                }
+            }).fail((err) => {
+                Notify("Sorry! An unexpected error occured while processing the request.");
+                $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).hide();
+            });
+        }
+    });
+}
+
 var cancel_update = () => {
+    $(`div[class="new-question"]`).html(``);
     $(`div[data-question_id="${selectedQuestion}"] div[class~='question']`).removeClass("hidden");
     $(`div[data-question_id="${selectedQuestion}"] div[class="question_content"]`).html(``);
     $(`div[class~="questionnaire"][data-question_id="${selectedQuestion}"] div[data-item='hover']`).addClass("hovercontrol");
+}
+
+var add_instruction = () => {
+    $(`span[class~="instruction"]`).remove();
+    $(`input[name="instructions"]`).removeClass("hidden");
 }
 
 var remove_option = (option_id) => {
     $(`div[data-option_id="${option_id}"]`).remove();
 }
 
+var save_question = () => {
+    $(`form[class="questionForm"]`).on("submit", function(evt) {
+        evt.preventDefault();
+        
+        let form = $(`form[class="questionForm"]`).serializeArray();
+        
+        $(`form[class="questionForm"] div[class="formoverlay"]`).show();
+
+        $(`form[class="questionForm"] button[type="submit"]`)
+            .attr({'disabled': true})
+            .html(`<i class="fa fa-spin fa-spinner"></i>`);
+
+        $.post(`${baseURL}surveys/savequestion`, form).then((response) => {
+
+            $(`form[class="questionForm"] div[class="formoverlay"]`).hide();
+            $(`form[class="questionForm"] button[type="submit"]`).attr({'disabled': false}).html(`Save`);
+            
+            Notify(response.data.result, responseCode(response.code));
+            
+            if(response.code == 200) {
+                if(response.data.additional !== undefined) {
+                    if(response.data.additional.clear !== undefined) {
+                        $(`form[class="appForm"] *`).val(``);
+                    }
+                    if(response.data.additional.href !== undefined) {
+                        window.location.href = `${baseURL}${response.data.additional.href}`;
+                    }
+                }
+            }
+
+        }).fail((err) => {
+            $(`form[class="questionForm"] div[class="formoverlay"]`).hide();
+            Notify("Sorry! An unexpected error occurred while processing the request.");
+            $(`form[class="questionForm"] button[type="submit"]`).attr({'disabled': false}).html(`Save`);
+        });
+
+    });
+}
+
 var trigger_edit = function(slug, question_id) {
     
     $(`div[class="formoverlay"]`).hide();
+    $(`div[class="new-question"]`).html(``);
     $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).show();
 
     $.get(`${baseURL}surveys/loadquestion/${slug}/${question_id}`).then((response) => {
@@ -95,6 +185,7 @@ var trigger_edit = function(slug, question_id) {
             selectedQuestion = question_id;
             $(`div[data-question_id="${question_id}"] div[class~='question']`).addClass("hidden");
             $(`div[data-question_id="${question_id}"] div[class="question_content"]`).html(response.data.result);
+            save_question();
         } else {
             Notify(response.data.result);
         }
@@ -104,6 +195,21 @@ var trigger_edit = function(slug, question_id) {
     }).fail((err) => {
         Notify("Sorry! An unexpected error occured while processing the request.");
         $(`div[data-question_id="${question_id}"] div[class="formoverlay"]`).hide();
+    });
+}
+
+var add_question = function(slug) {
+    $(`div[data-question_id="${selectedQuestion}"] div[class~='question']`).removeClass("hidden");
+    $(`div[data-question_id="${selectedQuestion}"] div[class="question_content"]`).html(``);
+    $(`div[class~="questionnaire"][data-question_id="${selectedQuestion}"] div[data-item='hover']`).addClass("hovercontrol");
+
+    $.get(`${baseURL}surveys/loadquestion/${slug}`).then((response) => {
+        if(response.code == 200) {
+            $(`div[class="new-question"]`).html(response.data.result);
+            save_question();
+        } else {
+            Notify(response.data.result, responseCode(response.code));
+        }
     });
 }
 
@@ -162,3 +268,5 @@ $(`form[class="appForm"]`).on("submit", function(evt) {
         Notify("Sorry! An unexpected error occurred while processing the request.");
     });
 });
+
+click_handler();
