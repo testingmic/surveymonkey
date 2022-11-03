@@ -12,18 +12,20 @@ class Surveys extends AppController {
      * @param String        $request
      * 
      */
-    public function modify($slug = null, $request = null, $page = null) {
+    public function modify($slug = null, $request = null) {
 
         $data = [];
         $data['isFound'] = false;
         $data['manageSurvey'] = true;
         $data['slug'] = null;
+        $file = 'survey';
 
         if( $slug == 'add') {
             $data['pagetitle'] = "New Survey";
         }
 
-        elseif($request == 'edit') {
+        elseif(in_array($request, ['edit', 'questions'])) {
+
             // get the survey
             $param = ['slug' => $slug, 'append_questions' => true];
 
@@ -35,6 +37,10 @@ class Surveys extends AppController {
                 return $this->show_display('not_found');
             }
 
+            if($request == 'questions') {
+                $file = 'questions';
+            }
+
             $data['survey'] = $survey;
             $data['slug'] = $slug;
             $data['pagetitle'] = $data['survey']['title'];
@@ -42,7 +48,7 @@ class Surveys extends AppController {
             $data['isFound'] = true;
         }
 
-        return $this->show_display('survey', $data);
+        return $this->show_display($file, $data);
     }
 
     /**

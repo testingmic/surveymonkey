@@ -55,6 +55,10 @@ class AppController extends ApiServices {
         try {
             // set the count
             $data['count'] = 1;
+
+            if( !empty($this->sessObject->_userData) ) {
+                $data['metadata'] = $this->sessObject->_userData['metadata'];
+            }
             
             // show the page
             return view($filename, $data);

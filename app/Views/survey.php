@@ -31,11 +31,11 @@ $settings = [
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between w-100">
-                                <div><span class="surveytitle">Configuration</span></div>
+                                <div><span class="surveytitle">Survey Configuration</span></div>
                                 <div>
                                     <?php if(!empty($slug)) { ?>
-                                    <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/edit" ?>/questions">
-                                        Questions
+                                    <a class="btn btn-secondary btn-sm" href="<?= $baseURL ?>surveys/modify/<?= !$isFound ? "add" : "{$slug}/questions" ?>">
+                                        Survey Questions
                                     </a>
                                     <a class="btn btn-sm btn-primary" target="_blank" href="<?= $baseURL ?>embed/<?= $slug ?>">
                                         <i class="fa fa-home"></i> Preview Survey

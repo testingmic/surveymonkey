@@ -11,12 +11,14 @@ include_once 'headtags.php';
         <div class="d-flex justify-content-between">
             <div></div>
             <div>
-                <a class="btn btn-outline-primary btn-sm" href="<?= $baseURL ?>surveys/modify/add">
-                    <i class="fa fa-place-of-worship"></i> New Survey
-                </a>
+                <?php if(hasPermission("surveys", "add", $metadata)) { ?>
+                    <a class="btn btn-outline-primary btn-sm" href="<?= $baseURL ?>surveys/modify/add">
+                        <i class="fa fa-place-of-worship"></i> New Survey
+                    </a>
+                <?php } ?>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-3">
             <?php foreach($surveys_list as $survey) { ?>
                 <div class="col-md-4">
                     <div class="card">
@@ -42,12 +44,16 @@ include_once 'headtags.php';
                         <div class="card-footer w-100">
                             <div class="w-100 d-flex justify-content-between">
                                 <div>
+                                    <?php if(hasPermission("surveys", "update", $metadata)) { ?>
                                     <a href="<?= $baseURL ?>surveys/modify/<?= $survey['slug'] ?>/edit" class="btn btn-sm btn-outline-success">
                                         <i class="fa fa-edit"></i> Edit
                                     </a>
+                                    <?php } ?>
+                                    <?php if(hasPermission("surveys", "delete", $metadata)) { ?>
                                     <button class="btn btn-sm btn-outline-danger">
                                         <i class="fa fa-trash"></i>
                                     </button>
+                                    <?php } ?>
                                 </div>
                                 <div>
                                     <a target="_blank" href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>/results" class="btn btn-sm btn-outline-warning">
