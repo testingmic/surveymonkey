@@ -1,4 +1,7 @@
-var surveyResults, userFingerprint;
+var surveyResults, userFingerprint,
+    formoverlay = $(`div[class="formoverlay"]`),
+    selectedQuestion;
+    
 var Notify = (message, theme = "danger", icon = 'fa-bell-o') => {
     toastr.options.positionClass = 'toast-top-right';
     toastr.options.extendedTimeOut = 0;
@@ -163,6 +166,7 @@ var multi_voting_check = function() {
     let button_text = $(`button[id="poll-button"]`).attr("data-default");
     $(`button[id="poll-button"]`).attr({'disabled': false}).html(button_text);
 }
+
 setTimeout(() => {
     multi_voting_check();
 }, 3000);

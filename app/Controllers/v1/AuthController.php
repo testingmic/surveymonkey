@@ -27,7 +27,7 @@ class AuthController extends AccessBridge {
         try {
 
             $data = $this->auth_model->where('username', $params['username'])
-                                    ->orWhere('index_number', $params['username'])
+                                    ->orWhere('email', $params['username'])
                                     ->limit(1);
 
             $result = $data->get();
@@ -66,6 +66,8 @@ class AuthController extends AccessBridge {
 
                 // get the user token variable
                 $response['token'] = $this->access_token($data[0]['id'], $data[0]['client_id'], $data[0]['username']);
+                $response['href'] = "dashboard";
+                $response['clear'] = true;
 
                 $session = session();
                 $session->set([

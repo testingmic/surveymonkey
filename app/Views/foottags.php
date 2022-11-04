@@ -16,7 +16,8 @@
     <?php } ?>
     <?php if(isset($manageSurvey)) { ?>
         <script src="<?= $baseURL ?>assets/js/trix.js"></script>
-        <script src="<?= $baseURL ?>assets/js/dashboard.js"></script>
+        <script src="<?= $baseURL ?>assets/js/dashboard.js?v=1.0"></script>
     <?php } ?>
+    <script src="<?= $baseURL ?>assets/js/form.js"></script>
 </body>
 </html>

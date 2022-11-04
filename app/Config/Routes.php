@@ -33,6 +33,7 @@ $routes->setAutoRoute(false);
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 $routes->get('/embed', 'Surveys::embed');
+$routes->get('/dashboard', 'Home::index');
 $routes->post('/surveys/save', 'Surveys::save');
 $routes->get('/embed/(:any)', 'Surveys::embed/$1/$2');
 $routes->get('/surveys/results(:any)', 'Surveys::results');

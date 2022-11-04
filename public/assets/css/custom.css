@@ -171,6 +171,11 @@ h2 {
     margin: 0 0 10px
 }
 
+.appname {
+    font-family:var(--playful-font-family);
+    font-weight: bold;
+}
+
 time {
     cursor: pointer;
     border-bottom: 1px dashed transparent
@@ -320,6 +325,7 @@ time:hover {
 }
 
 .card-width {
+    min-width: 300px;
     max-width: 350px;
 }
 

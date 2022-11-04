@@ -14,6 +14,8 @@ class Surveys extends AppController {
      */
     public function modify($slug = null, $request = null) {
 
+        $this->login_check();
+
         $data = [];
         $data['isFound'] = false;
         $data['manageSurvey'] = true;
@@ -116,6 +118,9 @@ class Surveys extends AppController {
             $data['ip_address'] = $this->request->getIPAddress();
 
         } else {
+            
+            $this->login_check();
+
             $data['manageSurvey'] = true;
         }
 

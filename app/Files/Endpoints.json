@@ -55,5 +55,13 @@
 				"question_id": "required|match_num"
 			}
 		}
+	},
+	"auth": {
+		"POST": {
+			"login": {
+				"username": "required|max_length=64",
+				"password": "required|max_length=32"
+			}
+		}
 	}
 }

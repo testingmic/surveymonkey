@@ -21,17 +21,6 @@ class AppController extends ApiServices {
         $this->imageObject = \Config\Services::image();
         $this->baseURL = trim(config('App')->baseURL, '/');
         
-        // if the token in session is empty
-        if( empty($this->sessObject->_generalAPIToken)) {
-            // Get the Token file
-            $TokenFile = APPPATH . "Files/System.json";
-            // if is load then load it and append the data in it
-            if(is_file($TokenFile) && file_exists($TokenFile)) {
-                $TokenFile = json_decode(file_get_contents($TokenFile), true);
-                $this->sessObject->set(['_generalAPIToken' => $TokenFile['token'], '_isLocalAccess' => true]);
-            }
-        }
-
     }
 
     /**
@@ -57,6 +46,7 @@ class AppController extends ApiServices {
             $data['count'] = 1;
             $data['metadata'] = [];
 
+            // set the user data
             $data['_userData'] = $this->_userData;
             
             // confirm if the user is logged in
@@ -71,6 +61,27 @@ class AppController extends ApiServices {
         }
     }
 
+    /**
+     * Login Check
+     * 
+     * @return Bool
+     */
+    public function login_check() {
+        
+        if(empty($this->sessObject->_clientId) && empty($this->sessObject->_userApiToken)) {
+            try {
+                die( view("login") );
+            } catch(\Exception $e) {
+                die( view("not_found", [
+                    'pagetitle' => 'Access Denied',
+                    'content' => $this->permission_denied
+                ]) );
+            } 
+        }
+
+        return true;
+
+    }
 
     /**
      * Api Request Response

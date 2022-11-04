@@ -7,13 +7,14 @@ use App\Controllers\AppController;
 class Home extends AppController {
 
     public function index() {
-        $data = [];
+        
+        $this->login_check();
 
         // get the clients and web statistics list
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys');
         
         try {
-            
+
             return $this->show_display('index', $data);
 
         } catch(\Exception $e) {
