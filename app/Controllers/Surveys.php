@@ -66,7 +66,15 @@ class Surveys extends AppController {
             return $this->show_display('not_found');
         }
 
-        $param = ['slug' => $slug, 'append_questions' => true];
+        $isResult = (bool) ($request == "results");
+
+        // if result then perform a login check
+        if($isResult) {
+            $this->login_check();
+        }
+
+        // set the parameters to use
+        $param = ['slug' => $slug, 'append_questions' => true, 'bypass_auth' => !$isResult];
 
         // get the clients and web statistics list
         $data['survey'] = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
@@ -86,8 +94,6 @@ class Surveys extends AppController {
             }
             $data['survey']['questions'] = $questions;
         }
-
-        $isResult = (bool) ($request == "results");
         
         $data['votersGUID'] = [];
         $data['surveySlug'] = $slug;
@@ -118,8 +124,6 @@ class Surveys extends AppController {
             $data['ip_address'] = $this->request->getIPAddress();
 
         } else {
-            
-            $this->login_check();
 
             $data['manageSurvey'] = true;
         }
@@ -279,6 +283,11 @@ class Surveys extends AppController {
             return $this->error('Sorry! There are no questions to answer in this survey.');
         }
 
+        // save the user fingerprint in session
+        if( !empty($params['guid']) ) {
+            $this->sessObject->set(['userFingerprint' => $params['guid']]);
+        }
+
         // save the answer if the question id was parsed
         if( !empty($params['question_id']) ) {
 
@@ -393,8 +402,8 @@ class Surveys extends AppController {
             ]);
 
             // if not successful
-            if( !isset($vote['status'])) {
-                return $vote;
+            if( !isset($vote['status']) ) {
+                return $this->error($vote);
             }
 
             $multipleVoting = (bool) !empty($theSurvey['settings']['allow_multiple_voting']);
@@ -411,7 +420,11 @@ class Surveys extends AppController {
             $additional['button_text'] = $multipleVoting ? "<i class='fa fa-dice-d6'></i> Cast Another Vote" : "<i class='fa fa-compress-arrows-alt'></i> Complete";
 
             $this->sessObject->remove('firstQuestion');
-            $this->sessObject->set(['forceRefresh' => true, 'initSurvey' => true]);
+            $this->sessObject->set([
+                'forceRefresh' => true, 
+                'initSurvey' => true,
+                'userFingerprint' => $params['guid']
+            ]);
 
         }
 

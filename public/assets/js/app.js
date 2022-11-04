@@ -152,6 +152,15 @@ var skipped_question = function() {
     $(`button[id="poll-button"]`).trigger("click");
 }
 
+var logout = () => {
+    $.post(`${baseURL}auth/logout`).then(() => {
+        Notify("You are successfully logged out");
+        setTimeout(() => {
+            window.location.href = `${baseURL}`;
+        }, 1000);
+    });
+}
+
 var multi_voting_check = function() {
     if($(`input[name="multipleVoting"]`).length) {
         let value = $(`input[name="multipleVoting"]`).val();

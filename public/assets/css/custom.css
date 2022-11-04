@@ -321,11 +321,11 @@ time:hover {
 }
 
 .card {
-    margin: auto
+    margin: auto;
 }
 
 .card-width {
-    min-width: 300px;
+    min-width: 320px;
     max-width: 350px;
 }
 
@@ -553,6 +553,10 @@ p.alert {
     .survey_analytic .progress-bar-container .progress-bar {
         width: 200px;
     }
+
+    .survey-header {
+        font-size: 25px;
+    }
 }
 
 @media (max-width:450px) {
@@ -662,4 +666,16 @@ trix-editor.short-height {
 
 .questionnaire .menu:hover {
     background: #f8f9fa;
+}
+
+.userprofile ul li {
+    font-size: 14px;
+}
+
+.userprofile ul li a {
+    color: #fff;
+}
+
+.userprofile ul li .dropdown-menu a {
+    color: #000;
 }

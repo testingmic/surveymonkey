@@ -13,7 +13,7 @@ class Auth extends AppController {
     public function logout() {
         
         // remove all sessions
-        $this->session->remove(['_schoolId', '_userId', '_userGroup', '_userApiToken', '_userData']);
+        $this->session->remove(['_clientId', '_userId', '_userGroup', '_userApiToken', '_userData']);
 
         // destroy all sessions
         $this->session->destroy();

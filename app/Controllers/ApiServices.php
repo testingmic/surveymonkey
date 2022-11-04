@@ -118,46 +118,50 @@ class ApiServices extends BaseController {
 		// confirm if the class actually exists
 		if(class_exists($AuthClass)) {
 
-			// create a new class for handling the resource
-			$authObject = new $AuthClass();
-			$validate = $authObject->validate_token("Bearer {$this->_userApiToken}", $version);
+			if( empty($params['bypass_auth']) ) {
 
-			// if the response contains refresh_token:
-			if(contains($validate, ['refresh_token:'])) {
+				// create a new class for handling the resource
+				$authObject = new $AuthClass();
+				$validate = $authObject->validate_token("Bearer {$this->_userApiToken}", $version);
 
-				// then reset the token
-				$this->_userApiToken = str_ireplace('refresh_token:', '', $validate);
-				$this->sessionObj->set('_generalAPIToken', $this->_userApiToken);
+				// if the response contains refresh_token:
+				if(contains($validate, ['refresh_token:'])) {
 
-				// create the file and write the token into the file
-				$TokenFile = APPPATH . "Files/System.json";
-				if(is_file($TokenFile) && file_exists($TokenFile)) {
-					$content = json_decode(file_get_contents($TokenFile), true);
-					$content['token'] = $this->_userApiToken;
-				} else {
-					$content['token'] = $this->_userApiToken;
+					// then reset the token
+					$this->_userApiToken = str_ireplace('refresh_token:', '', $validate);
+					$this->sessionObj->set('_generalAPIToken', $this->_userApiToken);
+
+					// create the file and write the token into the file
+					$TokenFile = APPPATH . "Files/System.json";
+					if(is_file($TokenFile) && file_exists($TokenFile)) {
+						$content = json_decode(file_get_contents($TokenFile), true);
+						$content['token'] = $this->_userApiToken;
+					} else {
+						$content['token'] = $this->_userApiToken;
+					}
+					$file = fopen($TokenFile, 'w');
+					fwrite($file, json_encode($content));
+					fclose($file);
+
+					// make the request again
+					return $this->postman($endpoint, $params);
 				}
-				$file = fopen($TokenFile, 'w');
-				fwrite($file, json_encode($content));
-				fclose($file);
 
-				// make the request again
-				return $this->postman($endpoint, $params);
-			}
+				// set the result content if the validation was successful
+				$result['result'] = $validate;
 
-			// set the result content if the validation was successful
-			$result['result'] = $validate;
+				// set the user information as a variable for the request
+				if( is_array($validate) ) {
+					$params['_userData'] = $validate;
+				}
 
-			// set the user information as a variable for the request
-			if( is_array($validate) ) {
-				$params['_userData'] = $validate;
 			}
 
 			// if an api request
 			$params['_apiRequest'] = true;
 		}
 		
-		if( empty($params['_userData'])) {
+		if( empty($params['_userData']) && empty($params['bypass_auth']) ) {
 			return [];
 		}
 
@@ -195,7 +199,7 @@ class ApiServices extends BaseController {
 		
 		return [
 			'request' => $request,
-			'_userData' => $params['_userData']
+			'_userData' => $params['_userData'] ?? []
 		];
 		
 	}

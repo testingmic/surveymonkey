@@ -36,12 +36,17 @@ $routes->get('/embed', 'Surveys::embed');
 $routes->get('/dashboard', 'Home::index');
 $routes->post('/surveys/save', 'Surveys::save');
 $routes->get('/embed/(:any)', 'Surveys::embed/$1/$2');
+
 $routes->get('/surveys/results(:any)', 'Surveys::results');
 $routes->post('/surveys/show_question', 'Surveys::question');
 $routes->post('/surveys/savequestion', 'Surveys::savequestion');
 $routes->get('/surveys/modify/(:any)', 'Surveys::modify/$1/$2/$3');
 $routes->post('/surveys/deletequestion/(:num)', 'Surveys::deletequestion/$1');
 $routes->get('/surveys/loadquestion/(:any)', 'Surveys::loadquestion/$1/$2');
+
+
+$routes->post('/auth/logout', 'Auth::logout');
+
 
 // command line commands
 $routes->cli('root/(:any)', 'Crontab::jobs/$1');
