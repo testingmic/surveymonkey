@@ -1,5 +1,5 @@
 $(`span[class~="trix-button-group--file-tools"], span[class~="trix-button-group-spacer"], span[class~="trix-button-group--history-tools"]`).remove();
-
+var activeQuestion;
 var _html_entities = (str) => {
     return String(str).replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
@@ -210,6 +210,7 @@ var add_question = function(slug) {
 if($(`input[name="surveyAnalytic"]`).length) {
     let data = $(`input[name="surveyAnalytic"]`).data();
     formoverlay.show();
+
     $.get(`${baseURL}surveys/results`, data).then((response) => {
         formoverlay.hide();
         if(response.code == 200) {
@@ -219,6 +220,7 @@ if($(`input[name="surveyAnalytic"]`).length) {
                 $.each(questions, function(i, e) {
                     $(`select[name="question_id"]`).append(`<option value="${i}">${e.title}</option>`);
                 });
+                activeQuestion = surveyResults.first_question;
                 populate_statistics(surveyResults, surveyResults.first_question);
             }
         }
@@ -233,12 +235,19 @@ if($(`input[name="surveyAnalytic"]`).length) {
             formoverlay.hide();
             if(response.code == 200) {
                 surveyResults = response.data.result;
+                populate_statistics(surveyResults, activeQuestion);
             }
         }).fail((err) => {
             formoverlay.hide();
         });
-    }, 100000);
+    }, 300000);
     
+    $(`select[name="question_id"][id="question_id"]`).on("change", function() {
+        let value = $(this).val();
+        activeQuestion = parseInt(value);
+        populate_statistics("default", value);
+    });
+
 }
 
 click_handler();
