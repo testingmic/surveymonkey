@@ -15,8 +15,8 @@ class AppController extends ApiServices {
     public $permission_denied = "Sorry! You are not permitted to access this resource.";
     public $processing_error = "Sorry! An unexpected error was encountered while processing the request.";
 
-    public function __construct()
-    {
+    public function __construct() {
+
         $this->sessObject = session();
         $this->imageObject = \Config\Services::image();
         $this->baseURL = trim(config('App')->baseURL, '/');
@@ -55,9 +55,13 @@ class AppController extends ApiServices {
         try {
             // set the count
             $data['count'] = 1;
+            $data['metadata'] = [];
 
-            if( !empty($this->sessObject->_userData) ) {
-                $data['metadata'] = $this->sessObject->_userData['metadata'];
+            $data['_userData'] = $this->_userData;
+            
+            // confirm if the user is logged in
+            if( !empty($data['_userData']) ) {
+                $data['metadata'] = $data['_userData']['metadata'];
             }
             
             // show the page

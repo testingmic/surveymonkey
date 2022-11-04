@@ -92,12 +92,12 @@ $(`button[id="poll-button"]`).on("click", async function() {
             question_id: $(`input[name='question[questionId]']`).val()
         }
     }
-
+    
+    multi_voting_check();
+    
     $(`button[id="poll-button"]`).attr({'disabled': true}).html(`<i class="fa fa-spin fa-spinner"></i>`);
 
     $(`div[class='select-notice']`).html(``);
-
-    multi_voting_check();
 
     $.post(`${baseURL}surveys/show_question`, data).then((response) => {
         if( response.code !== 200) {
@@ -160,7 +160,8 @@ var multi_voting_check = function() {
             }
         }
     }
-    $(`button[id="poll-button"]`).attr({'disabled': false});
+    let button_text = $(`button[id="poll-button"]`).attr("data-default");
+    $(`button[id="poll-button"]`).attr({'disabled': false}).html(button_text);
 }
 setTimeout(() => {
     multi_voting_check();

@@ -18,7 +18,7 @@ include_once 'headtags.php';
                 <div><?= $survey['description'] ?></div>
             </div>
             <div class="text-center mt-3">
-                <button disabled id="poll-button" data-default="<?= $survey['button_text'] ?>" class="btn btn-success begin-button">
+                <button disabled id="poll-button" data-default="<?= $isContinue ? "Continue" : $survey['button_text'] ?>" class="btn btn-success begin-button">
                     <?= $isContinue ? "Continue" : "Please wait <i class='fa fa-spin fa-spinner'></i>" ?>
                 </button>
                 <div class="mt-3 hidden" id="skipquestion">

@@ -5,6 +5,7 @@ use CodeIgniter\HTTP\Request;
 
 class ApiServices extends BaseController {
 
+	public $_userData;
 	public $req_method;
 	public $generalApi;
     public $_userApiToken;
@@ -12,10 +13,7 @@ class ApiServices extends BaseController {
 	public $max_attachment_size = 25;
 	public $accepted_file_types = ".pdf,.jpg,.png,.jpeg,.docx,.doc";
     public $server_uri = "http://localhost/survey/public/api/";
-	
-	private $class_method = 'list';
 	private $global_limit = 500;
-	private $ApiEndpoint;
 
     /**
 	 * This is the start point for processing a either a GET, POST, PUT or DELETE request against the api
@@ -47,58 +45,16 @@ class ApiServices extends BaseController {
 			$this->_userApiToken = $this->sessObject->_generalAPIToken;
 		}
 
+		$postman = $this->postman($endpoint, $param);
+
+		// get the user request
+		$request = $postman['request'] ?? [];
+
+		// get the user data
+		$this->_userData = $postman['_userData'] ?? [];
+
 		// print the results
-		return $this->curl_request($endpoint, $param);
-	}
-
-	/**
-	 * Load a Local File
-	 * 
-	 * If the save data is parsed, then it will save the data in the file
-	 * 
-	 * @param String	$filename
-	 * @param Mixed		$save_data
-	 * 
-	 * @return Mixed
-	 */
-	final function local_file_handler($filename = null, $save_data = false) {
-
-		// local file
-		$localFile = APPPATH . "Files/".ucfirst($filename).".json";
-
-		// if is load then load it and append the data in it
-        if(is_file($localFile) && file_exists($localFile)) {
-            $localFile = json_decode(file_get_contents($localFile), true);
-
-			// if the request is not to save the file
-			if( empty($save_data) ) {
-				return $localFile;
-			}
-        }
-
-		// if the save_data is not empty
-		if(!empty($save_data)) {
-			$file = fopen($localFile, 'w');
-			fwrite($file, json_encode($save_data));
-			fclose($file);
-		}
-
-		return false;
-	}
-
-    /**
-	 * This is used by $this->curl_lookup
-	 * 
-	 * @param String	$endpoint
-	 * @param Array		$params
-	 * 
-	 * @return Array
-	 */
-	private function curl_request(string $endpoint = null, $params = []) {
-
-		// challenges with multipart/form-data resulted in using this endpoint to make
-		return $this->postman($endpoint, $params ?? []);
-
+		return $request;
 	}
 
     /**
@@ -111,9 +67,6 @@ class ApiServices extends BaseController {
 	 */
 	private function postman($endpoint, $params) {
 		
-		// append the session variable
-		$session = $this->sessionObj;
-
 		$split = explode('/', $endpoint);
 
 		$class = $split[0];
@@ -165,48 +118,39 @@ class ApiServices extends BaseController {
 		// confirm if the class actually exists
 		if(class_exists($AuthClass)) {
 
-			// use the session value to make the request
-			if( !empty($session->_userData) && empty($this->generalApi) ) {
-				$params['_userData'] = $session->_userData;
-			} else {
-				// create a new class for handling the resource
-				$authObject = new $AuthClass();
-				$validate = $authObject->validate_token("Bearer {$this->_userApiToken}", $version);
+			// create a new class for handling the resource
+			$authObject = new $AuthClass();
+			$validate = $authObject->validate_token("Bearer {$this->_userApiToken}", $version);
 
-				// if the response contains refresh_token:
-				if(contains($validate, ['refresh_token:'])) {
+			// if the response contains refresh_token:
+			if(contains($validate, ['refresh_token:'])) {
 
-					// then reset the token
-					$this->_userApiToken = str_ireplace('refresh_token:', '', $validate);
-					$this->sessionObj->set('_generalAPIToken', $this->_userApiToken);
+				// then reset the token
+				$this->_userApiToken = str_ireplace('refresh_token:', '', $validate);
+				$this->sessionObj->set('_generalAPIToken', $this->_userApiToken);
 
-					// create the file and write the token into the file
-					$TokenFile = APPPATH . "Files/System.json";
-					if(is_file($TokenFile) && file_exists($TokenFile)) {
-						$content = json_decode(file_get_contents($TokenFile), true);
-						$content['token'] = $this->_userApiToken;
-					} else {
-						$content['token'] = $this->_userApiToken;
-					}
-					$file = fopen($TokenFile, 'w');
-					fwrite($file, json_encode($content));
-					fclose($file);
-
-					// make the request again
-					return $this->postman($endpoint, $params);
+				// create the file and write the token into the file
+				$TokenFile = APPPATH . "Files/System.json";
+				if(is_file($TokenFile) && file_exists($TokenFile)) {
+					$content = json_decode(file_get_contents($TokenFile), true);
+					$content['token'] = $this->_userApiToken;
+				} else {
+					$content['token'] = $this->_userApiToken;
 				}
+				$file = fopen($TokenFile, 'w');
+				fwrite($file, json_encode($content));
+				fclose($file);
 
-				// set the result content if the validation was successful
-				$result['result'] = $validate;
+				// make the request again
+				return $this->postman($endpoint, $params);
+			}
 
-				// set the user information as a variable for the request
-				if( is_array($validate) ) {
-					$params['_userData'] = $validate;
+			// set the result content if the validation was successful
+			$result['result'] = $validate;
 
-					// if the general api request is empty then dont save the value in session
-					$session->set(['_userData' => $params['_userData']]);
-				}
-			
+			// set the user information as a variable for the request
+			if( is_array($validate) ) {
+				$params['_userData'] = $validate;
 			}
 
 			// if an api request
@@ -242,14 +186,53 @@ class ApiServices extends BaseController {
 		// convert the response into an arry if not already in there
 		$request = $classObject->$class_method($params, $primary_key);
 
+		// if the request is 
 		if(in_array($this->req_method, ["GET"]) && isset($request['code'])) {
 			if($request['code'] == 401 && contains($request['result'], ['are unauthorized to access'])) {
 				$request = [];
 			}
 		}
 		
-		return $request;
+		return [
+			'request' => $request,
+			'_userData' => $params['_userData']
+		];
 		
+	}
+
+	/**
+	 * Load a Local File
+	 * 
+	 * If the save data is parsed, then it will save the data in the file
+	 * 
+	 * @param String	$filename
+	 * @param Mixed		$save_data
+	 * 
+	 * @return Mixed
+	 */
+	final function local_file_handler($filename = null, $save_data = false) {
+
+		// local file
+		$localFile = APPPATH . "Files/".ucfirst($filename).".json";
+
+		// if is load then load it and append the data in it
+        if(is_file($localFile) && file_exists($localFile)) {
+            $localFile = json_decode(file_get_contents($localFile), true);
+
+			// if the request is not to save the file
+			if( empty($save_data) ) {
+				return $localFile;
+			}
+        }
+
+		// if the save_data is not empty
+		if(!empty($save_data)) {
+			$file = fopen($localFile, 'w');
+			fwrite($file, json_encode($save_data));
+			fclose($file);
+		}
+
+		return false;
 	}
     
 }

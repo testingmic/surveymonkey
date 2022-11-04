@@ -9,9 +9,6 @@ class Home extends AppController {
     public function index() {
         $data = [];
 
-        // get list of all clients
-        $this->generalApi = true;
-        
         // get the clients and web statistics list
         $data['surveys_list'] = $this->api_lookup('GET', 'surveys');
         

@@ -4,7 +4,7 @@
     <script src="<?= $baseURL ?>assets/js/sweetalert.js"></script>
     <script src="<?= $baseURL ?>assets/js/toastr.js"></script>
     <!-- <script src="<?= $baseURL ?>assets/js/fingerprint.js"></script> -->
-    <script src="<?= $baseURL ?>assets/js/app.js?v=1.0.3"></script>
+    <script src="<?= $baseURL ?>assets/js/app.js?v=1.0.41"></script>
     <?php if(isset($surveySlug, $votersGUID, $ip_address)) { ?>
         <script>
         const fpPromise = import('https://fpcdn.io/v3/hXGuNdSTmPCM5hWHXWUj').then(FingerprintJS => FingerprintJS.load())
