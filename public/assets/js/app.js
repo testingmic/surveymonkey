@@ -150,7 +150,6 @@ var skipped_question = function() {
 }
 
 var multi_voting_check = function() {
-    $(`button[id="poll-button"]`).attr({'disabled': false});
     if($(`input[name="multipleVoting"]`).length) {
         let value = $(`input[name="multipleVoting"]`).val();
         if(value == "No") {
@@ -161,10 +160,11 @@ var multi_voting_check = function() {
             }
         }
     }
+    $(`button[id="poll-button"]`).attr({'disabled': false});
 }
 setTimeout(() => {
     multi_voting_check();
-}, 500);
+}, 3000);
 
 $(`select[name="question_id"][id="question_id"]`).on("change", function() {
     let value = $(this).val();
