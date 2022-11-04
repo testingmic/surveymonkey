@@ -1,4 +1,4 @@
-var surveyResults;
+var surveyResults, userFingerprint;
 var Notify = (message, theme = "danger", icon = 'fa-bell-o') => {
     toastr.options.positionClass = 'toast-top-right';
     toastr.options.extendedTimeOut = 0;
@@ -84,8 +84,10 @@ $(`button[id="poll-button"]`).on("click", async function() {
             return false
         }
 
+        let user_uid = userFingerprint !== undefined ? userFingerprint : guid();
+
         data = {
-            guid: guid(),
+            guid: user_uid,
             choice_id: selected_option.length ? selected_option.val() : "",
             question_id: $(`input[name='question[questionId]']`).val()
         }
@@ -148,10 +150,11 @@ var skipped_question = function() {
 }
 
 var multi_voting_check = function() {
+    $(`button[id="poll-button"]`).attr({'disabled': false});
     if($(`input[name="multipleVoting"]`).length) {
         let value = $(`input[name="multipleVoting"]`).val();
         if(value == "No") {
-            let user_guid = guid();
+            let user_guid = userFingerprint !== undefined ? userFingerprint : guid();
             if($.inArray(user_guid, votersGUID) !== -1) {
                 $(`button[id="poll-button"], div[id="skipquestion"]`).remove();
                 $(`div[class~="percentage"]`).html(`<button class="btn btn-success begin-button">One vote allowed!</button>`);
@@ -159,7 +162,9 @@ var multi_voting_check = function() {
         }
     }
 }
-multi_voting_check();
+setTimeout(() => {
+    multi_voting_check();
+}, 500);
 
 $(`select[name="question_id"][id="question_id"]`).on("change", function() {
     let value = $(this).val();
