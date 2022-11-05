@@ -68,13 +68,8 @@ class Surveys extends AppController {
 
         $isResult = (bool) ($request == "results");
 
-        // if result then perform a login check
-        if($isResult) {
-            $this->login_check();
-        }
-
         // set the parameters to use
-        $param = ['slug' => $slug, 'append_questions' => true, 'bypass_auth' => !$isResult];
+        $param = ['slug' => $slug, 'append_questions' => true, 'bypass_auth' => true];
 
         // get the clients and web statistics list
         $data['survey'] = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
@@ -145,7 +140,7 @@ class Surveys extends AppController {
             return $this->error($this->not_found_text());
         }
 
-        $param = ['slug' => $slug, 'append_questions' => true, 'append_votes' => true];
+        $param = ['slug' => $slug, 'append_questions' => true, 'append_votes' => true, 'bypass_auth' => true];
 
         // get the clients and web statistics list
         $survey = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
@@ -190,7 +185,6 @@ class Surveys extends AppController {
         function combine_array($array_keys = [], $array_values = [], $total) {
             $combine = [];
             foreach($array_keys as $key => $value) {
-                
                 $count = $array_values[$key] ?? 0;
                 $combine[$value]['count'] = $count;
                 $combine[$value]['percentage'] = empty($count) ? 0 : (round(($count / $total) * 100));
@@ -202,18 +196,33 @@ class Surveys extends AppController {
         $votes_count = $result['summary']['votes_count'];
         foreach($quest as $id => $item) {
             $ikey = array_key_first($item['answers']);
-            $item['counts'] = json_decode($item['answers'][$ikey]['votes'], true);
+            $item['counts'] = !empty($item['answers'][$ikey]['votes']) ? json_decode($item['answers'][$ikey]['votes'], true) : [];
             $item['grouping'] = combine_array($item['options'], $item['counts'], $votes_count);
             $item['votes_cast'] = array_sum(array_column($item['grouping'], 'count'));
 
+            if(isset($item['counts']['skipped'])) {
+                unset($item['counts']['skipped']);
+            }
+
+            // get the max key
+            $max_keys = array_keys($item['counts'], max($item['counts']));
+
+            foreach($max_keys as $m_key) {
+                if(isset($item['options'][$m_key])) {
+                    if( isset($item['grouping'][$item['options'][$m_key]]) ) {
+                        $item['grouping'][$item['options'][$m_key]]['leading'] = true;
+                    }
+                }
+            }
+
             if($item['votes_cast'] !== $votes_count) {
-                $skipped = $votes_count - $item['votes_cast'];
+                $skipped = abs($votes_count - $item['votes_cast']);
                 $item['grouping']['skipped'] = [
                     'count' => $skipped,
                     'percentage' => empty($skipped) ? 0 : (round(($skipped / $votes_count) * 100))
                 ];
             }
-
+            
             unset($item['counts']);
             unset($item['answers']);
 

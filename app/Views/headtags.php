@@ -32,7 +32,31 @@ $isLoggedIn = !empty($sessObj->_userApiToken) && !empty($sessObj->_clientId) && 
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/fontawesome.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/toastr.css">
     <link rel="stylesheet" href="<?= $baseURL ?>assets/css/trix.css">
-    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css">
+    <link rel="stylesheet" href="<?= $baseURL ?>assets/css/custom.css?v=1.0.5">
+    <meta name="description" content="The board of the Ghana Twitter Awards has finally released the list of nominees for this year’s edition. The Ghana Twitter Awards, also known as the GTAs, is an...">
+    
+    <meta property="og:url" content="<?= $baseURL ?>" />
+    <meta property="og:site_name" content="https://voting.ilivetech.us" />
+    <meta property="og:title" content="<?= $survey['title'] ?? $AppName ?>" />
+    <meta property="og:description" content="The board of the Ghana Twitter Awards has finally released the list of nominees for this year’s edition. The Ghana Twitter Awards, also known as the GTAs, is an..." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="<?= $baseURL; ?>assets/images/surveys/1.jpg">
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="<?= $baseURL ?>">
+    <meta name="twitter:title" content="<?= $survey['title'] ?? $AppName ?>">
+    <meta name="twitter:description" content="The board of the Ghana Twitter Awards has finally released the list of nominees for this year’s edition. The Ghana Twitter Awards, also known as the GTAs, is an...">
+    <meta name="twitter:image:src" content="<?= $baseURL; ?>assets/images/surveys/1.jpg">
+    <meta name="twitter:image:width" content="300">
+    <meta name="twitter:image:height" content="300">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6TG1Y5MW27"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6TG1Y5MW27');
+    </script>
 </head>
 <body>
     <div class="survey-container">

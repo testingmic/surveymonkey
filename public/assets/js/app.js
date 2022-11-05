@@ -154,7 +154,7 @@ var skipped_question = function() {
 
 var logout = () => {
     $.post(`${baseURL}auth/logout`).then(() => {
-        Notify("You are successfully logged out");
+        Notify("You are successfully logged out", "success");
         setTimeout(() => {
             window.location.href = `${baseURL}`;
         }, 1000);

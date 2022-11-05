@@ -52,7 +52,7 @@ var populate_statistics = function(results = "default", question_id) {
                 <div>
                     <div class="progress-bar-container mt-0 text-left">
                         <div class="progress-bar mt-1" title="${ee.count} votes">
-                            <div class="progress-bar-completed" style="width: ${ee.percentage}%;"></div>
+                            <div class="progress-bar-completed" style="${ii == "skipped" ? "background: #ff5722;" : ""}width: ${ee.percentage}%;${ee.leading !== undefined ? "background: #8bc34a;": ""}"></div>
                         </div>
                         <div class="d-flex justify-content-end" style="width:110px;font-size:14px">
                             <div style="margin-right:10px">

@@ -1,4 +1,9 @@
-    
+<div class="border-top text-center p-2 mt-5">
+            <strong>Powered By:</strong>
+            <a href="https://emmallextech.com" target="_blank">
+                Emmallex Technologies
+            </a>
+        </div>
     </div>
     <section hidden class="output"><div class="heading">Getting the visitor identifier...</div></section>
     <script>var baseURL = "<?= $baseURL ?>";</script>
@@ -23,7 +28,7 @@
     <script src="<?= $baseURL ?>assets/js/bootstrap.js"></script>
     <?php if(isset($manageSurvey)) { ?>
         <script src="<?= $baseURL ?>assets/js/trix.js"></script>
-        <script src="<?= $baseURL ?>assets/js/dashboard.js?v=1.0"></script>
+        <script src="<?= $baseURL ?>assets/js/dashboard.js?v=1.1.1"></script>
     <?php } ?>
     <script src="<?= $baseURL ?>assets/js/form.js"></script>
 </body>
