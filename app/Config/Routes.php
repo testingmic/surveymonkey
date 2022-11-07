@@ -43,6 +43,7 @@ $routes->post('/surveys/savequestion', 'Surveys::savequestion');
 $routes->get('/surveys/modify/(:any)', 'Surveys::modify/$1/$2/$3');
 $routes->post('/surveys/deletequestion/(:num)', 'Surveys::deletequestion/$1');
 $routes->get('/surveys/loadquestion/(:any)', 'Surveys::loadquestion/$1/$2');
+$routes->post('/surveys/savefingerprint/(:any)', 'Surveys::savefingerprint/$1');
 
 
 $routes->post('/auth/logout', 'Auth::logout');

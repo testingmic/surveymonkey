@@ -443,6 +443,18 @@ class Surveys extends AppController {
     }
 
     /**
+     * Display the Question
+     * 
+     * @param String        $fingerprint
+     * 
+     * @return Bool
+     */
+    public function savefingerprint($fingerprint) {
+        $this->sessObject->set(['userFingerprint' => $fingerprint]);
+        return true;
+    }
+
+    /**
      * Load Question
      * 
      * @param String    $slug

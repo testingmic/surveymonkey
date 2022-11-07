@@ -169,6 +169,7 @@ var multi_voting_check = function() {
             if($.inArray(user_guid, votersGUID) !== -1) {
                 $(`button[id="poll-button"], div[id="skipquestion"]`).remove();
                 $(`div[class~="percentage"]`).html(`<button class="btn btn-success begin-button">One vote allowed!</button>`);
+                $.post(`${baseURL}surveys/savefingerprint/${user_guid}`);
             }
         }
     }
