@@ -31,7 +31,15 @@ include_once 'headtags.php';
         <div class="container p-3 position-relative survey_analytic">
             <?= form_overlay() ?>
             <div class="row">
-                <div class="col-md-9"><h5>Survey Report</h5></div>
+                <div class="col-md-9">
+                    <h5>Survey Report</h5>
+                    <a href="<?= $baseURL ?>" class="btn btn-sm btn-outline-primary">
+                        <i class="fa fa-arrow-alt-circle-left"></i> Go Back
+                    </a>
+                    <a href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>/export" class="btn btn-sm btn-outline-danger">
+                        <i class="fa fa-file-pdf"></i> Export Results
+                    </a>
+                </div>
                 <div class="col-md-3">
                     <label for="">Select Question</label>
                     <select name="question_id" id="question_id" class="selectpicker form-control"></select>

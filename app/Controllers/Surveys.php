@@ -1,6 +1,8 @@
 <?php 
 namespace App\Controllers;
 
+use Dompdf\Dompdf;
+
 class Surveys extends AppController {
 
     private $invalid_question = 'Sorry! The question id parsed could not be found in this survey.';
@@ -67,9 +69,15 @@ class Surveys extends AppController {
         }
 
         $isResult = (bool) ($request == "results");
+        $isExport = (bool) ($request == "export");
 
         // set the parameters to use
         $param = ['slug' => $slug, 'append_questions' => true, 'bypass_auth' => true];
+
+        // if request is export
+        if($isExport) {
+            $param['append_votes'] = true;
+        }
 
         // get the clients and web statistics list
         $data['survey'] = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
@@ -93,6 +101,10 @@ class Surveys extends AppController {
         $data['votersGUID'] = [];
         $data['surveySlug'] = $slug;
         $data['isResult'] = $isResult;
+
+        if( $isExport ) {
+            return $this->export_survey($data);
+        }
 
         // if the request is not equal to results
         if(!$isResult) {
@@ -119,7 +131,6 @@ class Surveys extends AppController {
             $data['ip_address'] = $this->request->getIPAddress();
 
         } else {
-
             $data['manageSurvey'] = true;
         }
 
@@ -130,30 +141,33 @@ class Surveys extends AppController {
     /**
      * Prepare and return the survey results
      * 
-     * @return Array
+     * @return Array|Object
      */
-    public function results() {
+    public function results($param = []) {
 
-        $slug = $this->request->getGet('survey_slug');
+        $slug = $param['survey_slug'] ?? $this->request->getGet('survey_slug');
 
         if(empty($slug)) {
             return $this->error($this->not_found_text());
         }
 
-        $param = ['slug' => $slug, 'append_questions' => true, 'append_votes' => true, 'bypass_auth' => true];
+        $filter = ['slug' => $slug, 'append_questions' => true, 'append_votes' => true, 'bypass_auth' => true];
 
         // get the clients and web statistics list
-        $survey = $this->api_lookup('GET', 'surveys', $param)[0] ?? [];
+        $survey = $param['survey'] ?? $this->api_lookup('GET', 'surveys', $filter)[0] ?? [];
 
         // return the results
         if(empty($survey)) {
             return $this->error($this->not_found_text());
         }
 
+        global $round;
+
         $result = [];
+        $round = $param['round'] ?? 0;
         $result['summary']['votes_count'] = (int) $survey['submitted_answers'];
         $result['summary']['questions_count'] = count($survey['questions']);
-
+        
         function regroup_keys($array = []) {
             if( empty($array) ) {
                 return [];
@@ -184,10 +198,11 @@ class Surveys extends AppController {
 
         function combine_array($array_keys = [], $array_values = [], $total) {
             $combine = [];
+            global $round;
             foreach($array_keys as $key => $value) {
                 $count = $array_values[$key] ?? 0;
                 $combine[$value]['count'] = $count;
-                $combine[$value]['percentage'] = empty($count) ? 0 : (round(($count / $total) * 100));
+                $combine[$value]['percentage'] = empty($count) ? 0 : round((($count / $total) * 100), $round);
             }
             return $combine;
         }
@@ -231,9 +246,117 @@ class Surveys extends AppController {
 
         $result['questions'] = $questions;
         $result['first_question'] = array_key_first($questions);
-        
+
         return $this->api_response(['code' => 200, 'result' => $result]);
 
+    }
+
+    /**
+     * Export Survey as PDF
+     * 
+     * @param Array     $params
+     * 
+     * @return Mixed
+     */
+    private function export_survey(array $params = []) {
+
+        $data = $this->results([
+            'survey_slug' => $params['surveySlug'], 
+            'survey' => $params['survey'],
+            'round' => 1 
+        ])->getBody();
+        $data = !is_array($data) ? (is_object($data) ? (array) $data : json_decode($data, true)) : $data;
+
+        $html = "";
+        if($data['code'] && $data['code'] !== 200) {
+            return $this->error($this->not_found_text());
+        }
+        $result = $data['data']['result'];
+        $filename = "{$params['survey']['id']} - Survey Results.pdf";
+
+        $html .= "
+        <div style='' align='center'>
+            <h2>{$params['survey']['title']}</h2>
+        </div>";
+        foreach($result['questions'] as $question) {
+            $html .= "
+            <div style='margin-bottom:30px;'>
+            <table style='border: solid 1px #fbfbfb;' width='100%'>
+            <tr>
+                <td colspan='4' align='center'>
+                    <div style='padding:10px;border-bottom:solid 1px #569ff7;'>
+                        {$question['title']}
+                    </div>
+                </td>
+            </tr>";
+            $html .= "
+            <tr style='font-weight:bold;'>
+                <td align='center' width='10%'>#</td>
+                <td width='40%'>Description</td>
+                <td align='center' width='15%'>Votes</td>
+                <td align='center' width='15%'>Percentage</td>
+            </tr>";
+
+            $count = 1;
+            foreach($question['grouping'] as $key => $value) {
+
+                $leader = isset($value['leading']) ? "<span class='leader'>Lead</span>" : null;
+
+                $html .= "
+                <tr>
+                    <td align='center'>{$count}</td>    
+                    <td>
+                        {$key} {$leader}
+                    </td>
+                    <td ".($leader ? "style='color:#4caf50;font-weight:bold;font-size:18px;'" : null)." align='center'>{$value['count']}</td>
+                    <td ".($leader ? "style='color:#4caf50;font-weight:bold;font-size:18px;'" : null)." align='center'>{$value['percentage']}</td>
+                </tr>";
+                $count++;
+            }
+            $html .= "</table>
+            </div>";
+        }
+        $html .= "
+        <div align='center' style='margin-top:20px'>
+            <small><strong>Date Generated: </strong>".date("jS F, Y h:i:sa")."</small>
+        </div>
+        <style>
+            .leader {
+                color:#fff;
+                padding:3px;
+                background:#8bc34a;
+            }
+            @page { margin: 30px; margin-top: 0px; } body { margin: 30px; } .page_break { page-break-before: always; } 
+        </style>";
+        // echo json_encode($result);
+        $this->pdf_stream($filename, $html);
+    }
+
+    /**
+     * Generate the PDF File for Display
+     * 
+     * @param String        $filename
+     * @param HTML|String   $content
+     * 
+     * @return Binary
+     */
+    private function pdf_stream($filename, $content = "", $orientation = 'portrait') {
+        // create a new object of the class
+        $dompdf = new Dompdf();
+
+        // set the paper orientation
+        $dompdf->setPaper('A4', $orientation);
+
+        // set the html file content
+        $dompdf->loadHtml($content);
+
+        // render the page
+        $dompdf->render();
+
+        // display the pdf ile
+        $dompdf->stream($filename, ["compress" => 1, "Attachment" => false]);
+
+        exit();
     }
 
     /**

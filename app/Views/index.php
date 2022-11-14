@@ -40,22 +40,27 @@ include_once 'headtags.php';
                             <div>
                                 <?php if(hasPermission("surveys", "update", $metadata)) { ?>
                                 <a href="<?= $baseURL ?>surveys/modify/<?= $survey['slug'] ?>/edit" class="btn btn-sm btn-outline-success">
-                                    <i class="fa fa-edit"></i> Edit
+                                    <i class="fa fa-edit"></i>
                                 </a>
                                 <?php } ?>
-                                <?php if(hasPermission("surveys", "delete", $metadata)) { ?>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                                <?php } ?>
+                                <a target="_blank" href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa fa-eye"></i>
+                                </a>
                             </div>
                             <div>
+                                <?php if(hasPermission("surveys", "update", $metadata)) { ?>
+                                    <a href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>/export" class="btn btn-sm btn-outline-danger">
+                                        <i class="fa fa-file-pdf"></i> Export
+                                    </a>
+                                <?php } ?>
                                 <a href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>/results" class="btn btn-sm btn-outline-warning">
                                     <i class="fa fa-chart-bar"></i> Results
                                 </a>
-                                <a target="_blank" href="<?= $baseURL ?>embed/<?= $survey['slug'] ?>" class="btn btn-sm btn-outline-primary">
-                                    View
-                                </a>
+                                <?php if(hasPermission("surveys", "delete", $metadata)) { ?>
+                                    <button hidden class="btn btn-sm btn-outline-danger">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                <?php } ?>
                             </div>
                         </div>
                     </div>
